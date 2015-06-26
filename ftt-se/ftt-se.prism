@@ -1,0 +1,59 @@
+// Model of FTT-SE
+
+ctmc
+
+
+// number of slaves
+const int NUM_SLAVES = 3;
+// minimum required number of slaves for the system to function
+const int MIN_SLAVES = NUM_SLAVES - 1;
+
+
+// failure rate of slave nodes
+const double slave_node_fr = 1/6; // 6 months
+// failure rate of slave port
+const double slave_port_fr = 1/24; // 24 months
+// failure rate of slave cable
+const double slave_cable_fr = 1/48; // 48 months
+// failure rate of switch port
+const double switch_port_fr = 1/24; // 24 months
+// failure rate of slave region
+const double slave_region_fr = slave_node_fr + slave_port_fr +
+	slave_cable_fr + switch_port_fr;
+
+module slave_region
+
+	// number of slaves working
+	s : [0..NUM_SLAVES] init NUM_SLAVES;
+
+	// failure of a single slave
+	[] s>0 -> s*slave_region_fr : (s'=s-1);
+
+endmodule
+
+
+// failure rate of master
+const double master_fr = 1/12; // 12 months
+// failure rate of master port
+const double master_port_fr = 1/24; // 24 months
+// failure rate of master cable
+const double master_cable_fr = 1/48; // 48 months
+// failure rate of switch
+const double switch_fr = 1/12; // 12 months
+// failure rate of switch region
+const double master_switch_region_fr = master_fr + master_port_fr +
+	master_cable_fr + switch_port_fr + switch_fr;
+
+module master_switch_region
+
+	// 0 = master/switch region is faulty
+	// 1 = master/switch region is non-faulty
+	w : [0..1] init 1;
+
+	[] w=1 -> master_switch_region_fr : (w'=w-1);
+endmodule
+
+
+
+// the system has suffered a failure
+formula failure = (s<MIN_SLAVES) | (w=0);
