@@ -4,9 +4,11 @@ ctmc
 
 
 // number of slaves
-const int NUM_SLAVES = 3;
+const int NUM_SLAVES;
+// number of slaves whose failure can be tolerated
+const int REDUNDANT_SLAVES = 1;
 // minimum required number of slaves for the system to function
-const int MIN_SLAVES = NUM_SLAVES - 1;
+const int MIN_SLAVES = NUM_SLAVES - REDUNDANT_SLAVES;
 
 
 // failure rate of slave nodes
