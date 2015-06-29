@@ -29,7 +29,7 @@ module slave_region
 	s : [0..NUM_SLAVES] init NUM_SLAVES;
 
 	// failure of a single slave
-	[] s>0 -> s*slave_region_fr : (s'=s-1);
+	[] s>=MIN_SLAVES -> s*slave_region_fr : (s'=s-1);
 
 endmodule
 
