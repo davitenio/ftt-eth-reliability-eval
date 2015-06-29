@@ -56,6 +56,9 @@ module master_switch_region
 endmodule
 
 
-
+// Failure of the master/slave region
+label "master_switch_region_failure" = (w=0);
+// Number of required slaves for correct operation is exhausted
+label "slaves_exhausted" = (s<MIN_SLAVES);
 // the system has suffered a failure
-formula failure = (s<MIN_SLAVES) | (w=0);
+label "sys_failure" = (s<MIN_SLAVES) | (w=0);

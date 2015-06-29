@@ -1,0 +1,18 @@
+// time
+const int T;
+
+// Reliability of the system.
+P=? [ F=T !"sys_failure" ]
+
+// Probability that a failure of the master/switch region caused the system
+// failure. We specify this as the probability that before time T there is no
+// system failure and that then at time T there is a master/switch region
+// failure.
+P=? [ !"sys_failure" U<=T "master_switch_region_failure" ]
+
+// Probability that a failure of too many slaves caused the system
+// failure. We specify this as the probability that before time T there is no
+// system failure and that then at time T more slaves have failed than can
+// be tolerated.
+P=? [ !"sys_failure" U<=T "slaves_exhausted" ]
+
