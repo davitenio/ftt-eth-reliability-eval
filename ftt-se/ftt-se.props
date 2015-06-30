@@ -21,3 +21,10 @@ P=? [ !sys_failure U<=T "slaves_exhausted" ]
 // sys_fail.
 R{"mission_time_rw"}=? [ F "sys_fail" ]
 
+// Long-run probability that a failure of the master/switch region caused a system
+// failure.
+P=? [ !sys_failure U "master_switch_region_failure" ]
+
+// Long-run probability that a failure of too many slaves caused a system
+// failure.
+P=? [ !sys_failure U "slaves_exhausted" ]
