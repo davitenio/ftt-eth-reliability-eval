@@ -61,4 +61,10 @@ label "master_switch_region_failure" = (w=0);
 // Number of required slaves for correct operation is exhausted
 label "slaves_exhausted" = (s<MIN_SLAVES);
 // the system has suffered a failure
-label "sys_failure" = (s<MIN_SLAVES) | (w=0);
+formula sys_failure = (s<MIN_SLAVES) | (w=0);
+
+label "sys_fail" = (s<MIN_SLAVES) | (w=0);
+
+rewards "mission_time_rw"
+	!sys_failure: 1;
+endrewards
