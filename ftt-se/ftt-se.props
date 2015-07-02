@@ -61,3 +61,7 @@ R{"mission_time_rw_days"}=? [ F "sys_fail" ]
 
 // Verify that the system always fails at some point in time.
 P>=1 [ F sys_failure ]
+
+// Check that the set of states sys_failure are absorbing. That is, that once a
+// system failure occurs, the system does not become non-faulty again.
+P>=1 [ F G sys_failure ]
