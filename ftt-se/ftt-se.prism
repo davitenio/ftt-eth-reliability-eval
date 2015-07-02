@@ -1,61 +1,61 @@
-// Model of FTT-SE
+// Model of FTT-SE.
 
 ctmc
 
 
-// number of slaves
+// Number of slaves.
 const int NUM_SLAVES;
-// number of slaves whose failure can be tolerated
+// Number of slaves whose failure can be tolerated.
 const int REDUNDANT_SLAVES = 1;
-// minimum required number of slaves for the system to function
+// Minimum required number of slaves for the system to function.
 const int MIN_SLAVES = NUM_SLAVES - REDUNDANT_SLAVES;
 
-// Unit of time is seconds
+// Unit of time is seconds.
 //////////////////////////
 const int SEC_PER_MINUTE = 60;
 const int SEC_PER_HOUR = 60 * SEC_PER_MINUTE;
 const int SEC_PER_DAY = 24 * SEC_PER_HOUR;
 const int SEC_PER_MONTH = 30 * SEC_PER_DAY;
 
-// rate with which all TMs of a single EC are lost on a single link (we need to
+// Rate with which all TMs of a single EC are lost on a single link (we need to
 // calculate an appropriate value for this based on the number of TMs
 // transmitted per EC, the bit error rate, the TM inter-transmission time, and
-// the EC length.
+// the EC length).
 const double tm_omission_fr = 1/(15 * SEC_PER_MINUTE);
 
 
-// failure rate of slave nodes
+// Failure rate of slave nodes.
 const double slave_node_fr = 1/(6 * SEC_PER_MONTH);
-// failure rate of slave port
+// Failure rate of slave port.
 const double slave_port_fr = 1/(24 * SEC_PER_MONTH);
-// failure rate of slave cable
+// Failure rate of slave cable.
 const double slave_cable_fr = 1/(48 * SEC_PER_MONTH);
-// failure rate of switch port
+// Failure rate of switch port.
 const double switch_port_fr = 1/(24 * SEC_PER_MONTH);
-// failure rate of slave region
+// Failure rate of slave region.
 const double slave_region_fr = slave_node_fr + slave_port_fr +
 	slave_cable_fr + switch_port_fr + tm_omission_fr;
 
 module slave_region
 
-	// number of slaves working
+	// Number of slaves working.
 	s : [0..NUM_SLAVES] init NUM_SLAVES;
 
-	// failure of a single slave
+	// Failure of a single slave.
 	[] s>=MIN_SLAVES -> s*slave_region_fr : (s'=s-1);
 
 endmodule
 
 
-// failure rate of master
+// Failure rate of master.
 const double master_fr = 1/(12 * SEC_PER_MONTH);
-// failure rate of master port
+// Failure rate of master port.
 const double master_port_fr = 1/(24 * SEC_PER_MONTH);
-// failure rate of master cable
+// Failure rate of master cable.
 const double master_cable_fr = 1/(48 * SEC_PER_MONTH);
-// failure rate of switch
+// Failure rate of switch.
 const double switch_fr = 1/(12 * SEC_PER_MONTH);
-// failure rate of switch region
+// Failure rate of switch region.
 const double master_switch_region_fr = master_fr + master_port_fr +
 	master_cable_fr + switch_port_fr + switch_fr + tm_omission_fr;
 
@@ -69,11 +69,11 @@ module master_switch_region
 endmodule
 
 
-// Failure of the master/slave region
+// Failure of the master/slave region.
 label "master_switch_region_failure" = (w=0);
-// Number of required slaves for correct operation is exhausted
+// Number of required slaves for correct operation is exhausted.
 label "slaves_exhausted" = (s<MIN_SLAVES);
-// the system has suffered a failure
+// The system has suffered a failure.
 formula sys_failure = (s<MIN_SLAVES) | (w=0);
 
 label "sys_fail" = (s<MIN_SLAVES) | (w=0);
