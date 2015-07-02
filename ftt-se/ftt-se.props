@@ -49,8 +49,13 @@ P=? [ !sys_failure U<=T*SEC_PER_DAY "slaves_exhausted" ]
 // failure.
 P=? [ !sys_failure U "slaves_exhausted" ]
 
-
-// Expected mission time in seconds. We specify this as the expected amount of
+// Expected mission time in minutes. We specify this as the expected amount of
 // mission_time_rw reward accumulated until a state is reached that satisifes
 // sys_fail.
-R{"mission_time_rw"}=? [ F "sys_fail" ]
+R{"mission_time_rw_minutes"}=? [ F "sys_fail" ]
+
+// Expected mission time in hours.
+R{"mission_time_rw_hours"}=? [ F "sys_fail" ]
+
+// Expected mission time in days.
+R{"mission_time_rw_days"}=? [ F "sys_fail" ]
