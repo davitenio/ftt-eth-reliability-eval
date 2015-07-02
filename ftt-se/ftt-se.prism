@@ -11,6 +11,13 @@ const int REDUNDANT_SLAVES = 1;
 const int MIN_SLAVES = NUM_SLAVES - REDUNDANT_SLAVES;
 
 
+// rate with which all TMs of a single EC are lost on a single link (we need to
+// calculate an appropriate value for this based on the number of TMs
+// transmitted per EC, the bit error rate, the TM inter-transmission time, and
+// the EC length.
+const double tm_omission_fr = 1;
+
+
 // failure rate of slave nodes
 const double slave_node_fr = 1/6; // 6 months
 // failure rate of slave port
@@ -21,7 +28,7 @@ const double slave_cable_fr = 1/48; // 48 months
 const double switch_port_fr = 1/24; // 24 months
 // failure rate of slave region
 const double slave_region_fr = slave_node_fr + slave_port_fr +
-	slave_cable_fr + switch_port_fr;
+	slave_cable_fr + switch_port_fr + tm_omission_fr;
 
 module slave_region
 
@@ -44,7 +51,7 @@ const double master_cable_fr = 1/48; // 48 months
 const double switch_fr = 1/12; // 12 months
 // failure rate of switch region
 const double master_switch_region_fr = master_fr + master_port_fr +
-	master_cable_fr + switch_port_fr + switch_fr;
+	master_cable_fr + switch_port_fr + switch_fr + tm_omission_fr;
 
 module master_switch_region
 
