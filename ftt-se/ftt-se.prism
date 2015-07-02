@@ -70,13 +70,15 @@ endmodule
 
 
 // Failure of the master/slave region.
-label "master_switch_region_failure" = (w=0);
+formula master_switch_region_failure = (w=0);
 // Number of required slaves for correct operation is exhausted.
-label "slaves_exhausted" = (s<MIN_SLAVES);
+formula slaves_exhausted = (s<MIN_SLAVES);
 // The system has suffered a failure.
-formula sys_failure = (s<MIN_SLAVES) | (w=0);
+formula sys_failure = slaves_exhausted | master_switch_region_failure;
 
-label "sys_fail" = (s<MIN_SLAVES) | (w=0);
+// We need a label version of sys_failure because parametric
+// model checking only works with labels and not with formulas.
+label "sys_fail" = sys_failure;
 
 rewards "mission_time_rw_minutes"
 	!sys_failure: 1/SEC_PER_MINUTE;
