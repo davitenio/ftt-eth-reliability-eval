@@ -2,14 +2,14 @@
 const int T;
 
 
-// Reliability of the system within T minutes.
-P=? [ F=T*SEC_PER_MINUTE !sys_failure ]
+// Reliability of the system at T minutes.
+P=? [ G<=T*SEC_PER_MINUTE !sys_failure ]
 
-// Reliability of the system within T hours.
-P=? [ F=T*SEC_PER_HOUR !sys_failure ]
+// Reliability of the system at T hours.
+P=? [ G<=T*SEC_PER_HOUR !sys_failure ]
 
-// Reliability of the system within T days.
-P=? [ F=T*SEC_PER_DAY !sys_failure ]
+// Reliability of the system at T days.
+P=? [ G<=T*SEC_PER_DAY !sys_failure ]
 
 
 // Probability that a failure of the master/switch region caused the system
