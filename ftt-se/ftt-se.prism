@@ -21,7 +21,7 @@ const int SEC_PER_MONTH = 30 * SEC_PER_DAY;
 // calculate an appropriate value for this based on the number of TMs
 // transmitted per EC, the bit error rate, the TM inter-transmission time, and
 // the EC length).
-const double tm_omission_fr = 1/(15 * SEC_PER_MINUTE);
+const double ec_corruption_r = 1/(15 * SEC_PER_MINUTE);
 
 
 // Failure rate of slave nodes.
@@ -34,7 +34,7 @@ const double slave_cable_fr = 1/(48 * SEC_PER_MONTH);
 const double switch_port_fr = 1/(24 * SEC_PER_MONTH);
 // Failure rate of slave region.
 const double slave_region_fr = slave_node_fr + slave_port_fr +
-	slave_cable_fr + switch_port_fr + tm_omission_fr;
+	slave_cable_fr + switch_port_fr + ec_corruption_r;
 
 module slave_region
 
@@ -57,7 +57,7 @@ const double master_cable_fr = 1/(48 * SEC_PER_MONTH);
 const double switch_fr = 1/(12 * SEC_PER_MONTH);
 // Failure rate of switch region.
 const double master_switch_region_fr = master_fr + master_port_fr +
-	master_cable_fr + switch_port_fr + switch_fr + tm_omission_fr;
+	master_cable_fr + switch_port_fr + switch_fr + ec_corruption_r;
 
 module master_switch_region
 
