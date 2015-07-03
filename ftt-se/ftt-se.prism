@@ -12,16 +12,27 @@ const int MIN_SLAVES = NUM_SLAVES - REDUNDANT_SLAVES;
 
 // Unit of time is seconds.
 //////////////////////////
+const double SEC_PER_MILLISEC = 1/1000;
 const int SEC_PER_MINUTE = 60;
 const int SEC_PER_HOUR = 60 * SEC_PER_MINUTE;
 const int SEC_PER_DAY = 24 * SEC_PER_HOUR;
 const int SEC_PER_MONTH = 30 * SEC_PER_DAY;
 
+
+// EC corruption: An EC corruption occurs on a link L when all TMs of
+// a single EC are lost in L.
+
+// EC corruption probability
+const double ec_corruption_p = 0.005;
+// EC duration
+const double ec_duration = 1 * SEC_PER_MILLISEC;
+// EC rate
+const double ec_r = 1/ec_duration;
 // Rate with which all TMs of a single EC are lost on a single link (we need to
 // calculate an appropriate value for this based on the number of TMs
 // transmitted per EC, the bit error rate, the TM inter-transmission time, and
 // the EC length).
-const double ec_corruption_r = 1/(15 * SEC_PER_MINUTE);
+const double ec_corruption_r = ec_r * ec_corruption_p;
 
 
 // Failure rate of slave nodes.
