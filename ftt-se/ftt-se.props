@@ -1,48 +1,48 @@
 // Time
-const double T;
+const double t;
 
 
-// Reliability of the system at T minutes.
-P=? [ G<=T*SEC_PER_MINUTE !sys_failure ]
+// Reliability of the system at t minutes.
+P=? [ G<=t*SEC_PER_MINUTE !sys_failure ]
 
-// Reliability of the system at T hours.
-P=? [ G<=T*SEC_PER_HOUR !sys_failure ]
+// Reliability of the system at t hours.
+P=? [ G<=t*SEC_PER_HOUR !sys_failure ]
 
-// Reliability of the system at T days.
-P=? [ G<=T*SEC_PER_DAY !sys_failure ]
+// Reliability of the system at t days.
+P=? [ G<=t*SEC_PER_DAY !sys_failure ]
 
 
 // Probability that a failure of the master/switch region caused the system
-// failure within T minutes. We specify this as the probability that before
-// time T there is no system failure and that then at time T there is a
+// failure within t minutes. We specify this as the probability that before
+// time t there is no system failure and that then at time t there is a
 // master/switch region failure.
-P=? [ !sys_failure U<=T*SEC_PER_MINUTE master_switch_region_failure ]
+P=? [ !sys_failure U<=t*SEC_PER_MINUTE master_switch_region_failure ]
 
 // Probability that a failure of the master/switch region caused the system
-// failure within T hours.
-P=? [ !sys_failure U<=T*SEC_PER_HOUR master_switch_region_failure ]
+// failure within t hours.
+P=? [ !sys_failure U<=t*SEC_PER_HOUR master_switch_region_failure ]
 
 // Probability that a failure of the master/switch region caused the system
-// failure within T days.
-P=? [ !sys_failure U<=T*SEC_PER_DAY master_switch_region_failure ]
+// failure within t days.
+P=? [ !sys_failure U<=t*SEC_PER_DAY master_switch_region_failure ]
 
 // Long-run probability that a failure of the master/switch region caused a
 // system failure.
 P=? [ !sys_failure U master_switch_region_failure ]
 
 // Probability that a failure of too many slaves caused the system
-// failure within T minutes. We specify this as the probability that before
-// time T there is no system failure and that then at time T more slaves have
+// failure within t minutes. We specify this as the probability that before
+// time t there is no system failure and that then at time t more slaves have
 // failed than can be tolerated.
-P=? [ !sys_failure U<=T*SEC_PER_MINUTE slaves_exhausted ]
+P=? [ !sys_failure U<=t*SEC_PER_MINUTE slaves_exhausted ]
 
 // Probability that a failure of too many slaves caused the system
-// failure within T hours.
-P=? [ !sys_failure U<=T*SEC_PER_HOUR slaves_exhausted ]
+// failure within t hours.
+P=? [ !sys_failure U<=t*SEC_PER_HOUR slaves_exhausted ]
 
 // Probability that a failure of too many slaves caused the system
-// failure within T days.
-P=? [ !sys_failure U<=T*SEC_PER_DAY slaves_exhausted ]
+// failure within t days.
+P=? [ !sys_failure U<=t*SEC_PER_DAY slaves_exhausted ]
 
 // Long-run probability that a failure of too many slaves caused a system
 // failure.
