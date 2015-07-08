@@ -24,8 +24,10 @@ const int SEC_PER_MONTH = 30 * SEC_PER_DAY;
 
 const double e = 2.71828;
 
-// We assume 100 Mbps Ethernet.
-const int bps = 100 * pow(10, 6);
+// Megabits per second speed of the Ethernet links.
+const int mbps = 100;
+// Bits per second speed of the Ethernet links.
+const int bps = mbps * pow(10, 6);
 
 // Number of TMs transmitted per EC.
 const int tms_per_ec = 3;
