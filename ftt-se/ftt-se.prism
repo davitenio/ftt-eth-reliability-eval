@@ -19,9 +19,6 @@ const int SEC_PER_DAY = 24 * SEC_PER_HOUR;
 const int SEC_PER_MONTH = 30 * SEC_PER_DAY;
 
 
-// EC corruption: An EC corruption occurs on a link L when all TMs of
-// a single EC are lost in L.
-
 const double e = 2.71828;
 
 // Megabits per second speed of the Ethernet links.
