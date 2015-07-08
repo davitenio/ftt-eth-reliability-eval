@@ -1,5 +1,5 @@
 // Time
-const int T;
+const double T;
 
 
 // Reliability of the system at T minutes.
