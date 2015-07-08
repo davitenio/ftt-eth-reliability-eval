@@ -102,6 +102,7 @@ module master_switch_region
 	w : [0..1] init 1;
 
 	[] w=1 -> master_switch_region_fr : (w'=w-1);
+
 endmodule
 
 
