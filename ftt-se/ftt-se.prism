@@ -73,12 +73,15 @@ const double slave_region_fr = slave_node_fr + slave_port_fr +
 	slave_cable_fr + switch_port_fr + ec_corruption_r;
 
 
-// Babbling idiot probability, i.e., probability that a slave region fails due
-// to a babbling idiot and this prevents TMs from reaching the slaves in time
-// and thus causes a global failure.
+// Babbling idiot failure mode probability, i.e., conditional probability that
+// given that a slave region fails, the failure mode is a babbling idiot that
+// causes a global failure. This may occur for example if the babbling idiot
+// failure prevents TMs from reaching the slaves in time.
 const double babbling_idiot_p = 0.01;
-// Probability of a slave impersonating as a master and thereby disrupting all
-// communication by, e.g., sending bogus TMs.
+// Master impersonation failure mode probability, i.e., conditional probability
+// that given that a slave region fails, the failure mode is a slave
+// impersonating as a master and this causing a global failure. This may occur
+// for example if a slave starts sending bogus TMs.
 const double master_impersonation_p = 0.001;
 
 // Conditional probability that a fault is contained in a slave region given
