@@ -65,3 +65,12 @@ A [ F sys_failure ]
 // Check that the set of states sys_failure are absorbing. That is, that once a
 // system failure occurs, the system does not become non-faulty again.
 P>=1 [ F G sys_failure ]
+
+// Probability of slave redundancy attrition occurring in the first t minutes.
+P=? [ F<=t*SEC_PER_MINUTE s = MIN_SLAVES  & !sys_failure]
+
+// Probability of slave redundancy attrition occurring in the first t hours.
+P=? [ F<=t*SEC_PER_HOUR s = MIN_SLAVES  & !sys_failure]
+
+// Probability of slave redundancy attrition occurring in the first t days.
+P=? [ F<=t*SEC_PER_DAY s = MIN_SLAVES  & !sys_failure]
