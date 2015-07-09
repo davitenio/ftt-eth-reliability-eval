@@ -72,13 +72,32 @@ const double switch_port_fr = 1/(24 * SEC_PER_MONTH);
 const double slave_region_fr = slave_node_fr + slave_port_fr +
 	slave_cable_fr + switch_port_fr + ec_corruption_r;
 
+
+// Babbling idiot probability, i.e., probability that a slave region fails due
+// to a babbling idiot and this prevents TMs from reaching the slaves in time
+// and thus causes a global failure.
+const double babbling_idiot_p = 0.01;
+// Probability of a slave impersonating as a master and thereby disrupting all
+// communication by, e.g., sending bogus TMs.
+const double master_impersonation_p = 0.001;
+
+// Conditional probability that a fault is contained in a slave region given
+// that the slave region has failed.
+const double slave_region_coverage =
+    (1 - babbling_idiot_p - master_impersonation_p);
+
 module slave_region
 
 	// Number of slaves working.
 	s : [0..NUM_SLAVES] init NUM_SLAVES;
+	uncovered_slave_fault : bool init false;
 
-	// Failure of a single slave.
-	[] s>=MIN_SLAVES -> s*slave_region_fr : (s'=s-1);
+	[] s>=MIN_SLAVES ->
+		// Failure of a single slave that is covered.
+		s * slave_region_fr * slave_region_coverage: (s'=s-1) +
+		// Failure of a single slave that is NOT covered.
+		s * slave_region_fr * (1 - slave_region_coverage):
+			(uncovered_slave_fault'=true);
 
 endmodule
 
@@ -111,7 +130,8 @@ formula master_switch_region_failure = (w=0);
 // Number of required slaves for correct operation is exhausted.
 formula slaves_exhausted = (s<MIN_SLAVES);
 // The system has suffered a failure.
-formula sys_failure = slaves_exhausted | master_switch_region_failure;
+formula sys_failure = slaves_exhausted | master_switch_region_failure |
+    uncovered_slave_fault;
 
 // We need a label version of sys_failure because parametric
 // model checking only works with labels and not with formulas.
