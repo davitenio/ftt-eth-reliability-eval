@@ -100,7 +100,7 @@ module slave_region
 		s * slave_region_fr * slave_region_coverage: (s'=s-1) +
 		// Failure of a single slave that is NOT covered.
 		s * slave_region_fr * (1 - slave_region_coverage):
-			(uncovered_slave_fault_occurred'=true);
+			(s'=s-1) & (uncovered_slave_fault_occurred'=true);
 
 endmodule
 
