@@ -16,19 +16,19 @@ P=? [ G<=t*SEC_PER_DAY !sys_failure ]
 // failure within t minutes. We specify this as the probability that before
 // time t there is no system failure and that then at time t there is a
 // master/switch region failure.
-P=? [ !sys_failure U<=t*SEC_PER_MINUTE master_switch_region_failure ]
+P=? [ !sys_failure U<=t*SEC_PER_MINUTE master_switch_region_is_faulty ]
 
 // Probability that a failure of the master/switch region caused the system
 // failure within t hours.
-P=? [ !sys_failure U<=t*SEC_PER_HOUR master_switch_region_failure ]
+P=? [ !sys_failure U<=t*SEC_PER_HOUR master_switch_region_is_faulty ]
 
 // Probability that a failure of the master/switch region caused the system
 // failure within t days.
-P=? [ !sys_failure U<=t*SEC_PER_DAY master_switch_region_failure ]
+P=? [ !sys_failure U<=t*SEC_PER_DAY master_switch_region_is_faulty ]
 
 // Long-run probability that a failure of the master/switch region caused a
 // system failure.
-P=? [ !sys_failure U master_switch_region_failure ]
+P=? [ !sys_failure U master_switch_region_is_faulty ]
 
 // Probability that a failure of too many slaves caused the system
 // failure within t minutes. We specify this as the probability that before

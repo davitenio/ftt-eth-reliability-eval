@@ -121,19 +121,18 @@ module master_switch_region
 
 	// 0 = master/switch region is faulty
 	// 1 = master/switch region is non-faulty
-	w : [0..1] init 1;
+	master_switch_region_is_faulty : bool init false;
 
-	[] w=1 -> master_switch_region_fr : (w'=w-1);
+	[] !master_switch_region_is_faulty ->
+		master_switch_region_fr : (master_switch_region_is_faulty'=true);
 
 endmodule
 
 
-// Failure of the master/slave region.
-formula master_switch_region_failure = (w=0);
 // Number of required slaves for correct operation is exhausted.
 formula slaves_exhausted = (s<MIN_SLAVES);
 // The system has suffered a failure.
-formula sys_failure = slaves_exhausted | master_switch_region_failure |
+formula sys_failure = slaves_exhausted | master_switch_region_is_faulty |
     uncovered_slave_fault;
 
 // We need a label version of sys_failure because parametric
