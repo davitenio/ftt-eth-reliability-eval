@@ -119,8 +119,6 @@ const double master_switch_region_fr = master_fr + master_port_fr +
 
 module master_switch_region
 
-	// 0 = master/switch region is faulty
-	// 1 = master/switch region is non-faulty
 	master_switch_region_is_faulty : bool init false;
 
 	[] !master_switch_region_is_faulty ->
