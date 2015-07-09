@@ -80,7 +80,7 @@ const double slave_region_fr = slave_node_fr + slave_port_fr +
 const double babbling_idiot_p = 0.01;
 // Master impersonation failure mode probability, i.e., conditional probability
 // that given that a slave region fails, the failure mode is a slave
-// impersonating as a master and this causing a global failure. This may occur
+// impersonating as a master and this causes a global failure. This may occur
 // for example if a slave starts sending bogus TMs.
 const double master_impersonation_p = 0.001;
 
