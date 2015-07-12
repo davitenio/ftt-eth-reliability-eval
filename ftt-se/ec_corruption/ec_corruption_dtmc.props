@@ -1,0 +1,14 @@
+const int n;
+
+// Expectation of the geometric distribution. The value should always be 1/ec_corruption_p
+R=? [ F ec_corrupted ]
+
+// Check that the expectation of the geometric distribution is always equal to 1/ec_corruption_p
+R=? [ F ec_corrupted ] = 1/ec_corruption_p
+
+// Cumulative distribution function. It should always be equal to 1 - (1 - ec_corruption_p)^n
+P=? [ F<=n ec_corrupted]
+
+// Check that the cumulative distribution function is always equal to 1 - (1 - ec_corruption_p)^n
+P=? [ F<=n ec_corrupted] = 1 - pow(1 - ec_corruption_p, n)
+

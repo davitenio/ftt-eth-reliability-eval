@@ -1,0 +1,21 @@
+// Implements a random variable X that follows a geometric distribution with
+// parameter ec_corruption_p and gives the number of elapsed ECs until the
+// first EC is corrupted.
+
+dtmc
+
+const double ec_corruption_p;
+
+module ec
+
+	ec_corrupted : bool init false;
+
+	[ec_elapsed] !ec_corrupted ->
+		ec_corruption_p: (ec_corrupted'=true) +
+		(1 - ec_corruption_p) : true;
+
+endmodule
+
+rewards
+	[ec_elapsed] true: 1;
+endrewards
