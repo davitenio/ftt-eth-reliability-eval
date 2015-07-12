@@ -3,19 +3,20 @@ ctmc
 
 // EC duration
 const double ec_duration;
-// EC rate
-const double ec_r = 1/ec_duration;
 
+// EC corruption probability
 const double ec_corruption_p;
 
-// Rate with which an EC is corrupted, i.e., all its TMs are lost
-const double ec_corruption_r = ec_r * ec_corruption_p;
-
+const int NUM_PHASES = 500;
 
 module ec
 
+	phase : [1..NUM_PHASES+1];
 	ec_corrupted : bool init false;
 
-	[] !ec_corrupted -> ec_corruption_r : (ec_corrupted'=true);
+	[] phase < NUM_PHASES -> NUM_PHASES/ec_duration: (phase'=phase+1);
+	[] phase=NUM_PHASES  ->
+		ec_corruption_p * NUM_PHASES/ec_duration: (phase'=phase+1) & (ec_corrupted'=true) +
+		(1 - ec_corruption_p) * NUM_PHASES/ec_duration: (phase'=1);
 
 endmodule
