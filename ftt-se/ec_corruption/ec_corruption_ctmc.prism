@@ -19,3 +19,10 @@ module ec
 	[] !ec_corrupted -> ec_corruption_r : (ec_corrupted'=true);
 
 endmodule
+
+rewards
+
+	// One reward for each elapsed EC
+	true : ec_r;
+
+endrewards

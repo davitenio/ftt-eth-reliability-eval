@@ -2,5 +2,9 @@ const int n;
 
 P=? [ F[(n-1)*ec_duration,n*ec_duration] ec_corrupted ]
 
-P=? [ F<=n*ec_duration ec_corrupted]
+P=? [ F<=n*ec_duration ec_corrupted ]
+
+// Check that the expected number of elapsed ECs until the first EC is
+// corrupted corresponds to a geometric distribution.
+R=? [ F ec_corrupted ] = 1/ec_corruption_p
 
