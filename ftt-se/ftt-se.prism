@@ -1,4 +1,4 @@
-// Model of FTT-SE.
+// Model of FTT-SE: single switch with external master node attached.
 
 ctmc
 
