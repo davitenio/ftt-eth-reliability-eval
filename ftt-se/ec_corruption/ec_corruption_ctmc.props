@@ -11,3 +11,5 @@ R=? [ F ec_corrupted ] = 1/ec_corruption_p
 // Geometric distribution probability mass function.
 pow((1-ec_corruption_p), n-1) * ec_corruption_p
 
+// Geometric distribution cumulative distribution function.
+1 - pow((1-ec_corruption_p), n)
