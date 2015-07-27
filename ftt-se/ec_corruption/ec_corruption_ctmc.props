@@ -1,13 +1,16 @@
 const int n;
 
-P=? [ F<=n*ec_duration ec_corrupted ]
-
 // Check that the expected number of elapsed ECs until the first EC is
 // corrupted corresponds to a geometric distribution.
-R=? [ F ec_corrupted ] = 1/ec_corruption_p
+R=? [ F ec_corrupted ]=1/ec_corruption_p
+
+// Geometric distribution cumulative distribution function (CDF).
+1-pow((1-ec_corruption_p), n)
+
+// A plot of this property for different values of n should approximate the CDF
+// of a r.v. ~ Geo(ec_corruption_p)
+P=? [ F<=n*ec_duration ec_corrupted ]
 
 // Geometric distribution probability mass function.
-pow((1-ec_corruption_p), n-1) * ec_corruption_p
+pow((1-ec_corruption_p), n-1)*ec_corruption_p
 
-// Geometric distribution cumulative distribution function.
-1 - pow((1-ec_corruption_p), n)
