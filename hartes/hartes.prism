@@ -1,0 +1,143 @@
+// Model of HaRTES: single switch with embedded master.
+
+ctmc
+
+
+// Number of slaves.
+const int NUM_SLAVES;
+// Number of slaves whose failure can be tolerated.
+const int REDUNDANT_SLAVES = 1;
+// Minimum required number of slaves for the system to function.
+const int MIN_SLAVES = NUM_SLAVES - REDUNDANT_SLAVES;
+
+// Unit of time is seconds.
+//////////////////////////
+const double SEC_PER_MILLISEC = 1/1000;
+const int SEC_PER_MINUTE = 60;
+const int SEC_PER_HOUR = 60 * SEC_PER_MINUTE;
+const int SEC_PER_DAY = 24 * SEC_PER_HOUR;
+const int SEC_PER_MONTH = 30 * SEC_PER_DAY;
+
+
+const double e = 2.71828;
+
+// Megabits per second speed of the Ethernet links.
+const int mbps = 100;
+// Bits per second speed of the Ethernet links.
+const int bps = mbps * pow(10, 6);
+
+// Number of TMs transmitted per EC.
+const int tms_per_ec = 3;
+// Frame size for TMs.
+const int tm_size_bytes = 64;
+const int tm_size_bits = tm_size_bytes * 8;
+// Time to transmit a single TM.
+const double tm_duration = tm_size_bits / bps;
+
+// EC duration
+const double ec_duration = 1 * SEC_PER_MILLISEC;
+// EC rate
+const double ec_r = 1/ec_duration;
+
+// Exponent for bit error ratio.
+const double bit_error_ratio_exponent;
+// Bit error ratio: 1 bit lost out of 10^bit_error_ratio_exponent,
+// e.g., if bit_error_ratio_exponent = 6, then 1 bit is lost out of 10^6 =
+// 1,000,000 bits.
+const double bit_error_ratio = 1/pow(10, bit_error_ratio_exponent);
+// Bit error rate.
+const double bit_error_r = bit_error_ratio * bps;
+// EC corruption probability.
+// We assume bit errors are arrivals of a Poisson process. An EC corruption
+// occurs when all TMs of an EC are corrupted, i.e., when all TMs are affected
+// by at least 1 bit error. Note that since we use a Poisson process model, all
+// that matters for the EC corruption probability is the bit error rate, the TM
+// duration, and the number of TMs.
+const double ec_corruption_p =
+    pow(1 - pow(e, -bit_error_r * tm_duration), tms_per_ec);
+
+// Rate with which all TMs of a single EC are lost on a single link.
+const double ec_corruption_r = ec_r * ec_corruption_p;
+
+
+// Failure rate of slave nodes.
+const double slave_node_fr = 1/(6 * SEC_PER_MONTH);
+// Failure rate of slave port.
+const double slave_port_fr = 1/(24 * SEC_PER_MONTH);
+// Failure rate of slave cable.
+const double slave_cable_fr = 1/(48 * SEC_PER_MONTH);
+// Failure rate of switch port.
+const double switch_port_fr = 1/(24 * SEC_PER_MONTH);
+// Failure rate of slave region.
+const double slave_region_fr = slave_node_fr + slave_port_fr +
+	slave_cable_fr + switch_port_fr + ec_corruption_r;
+
+
+// Babbling idiot failure mode probability, i.e., conditional probability that
+// given that a slave region fails, the failure mode is a babbling idiot that
+// causes a global failure. This may occur for example if the babbling idiot
+// failure prevents TMs from reaching the slaves in time.
+const double babbling_idiot_p = 0.01;
+// Master impersonation failure mode probability, i.e., conditional probability
+// that given that a slave region fails, the failure mode is a slave
+// impersonating as a master and this causes a global failure. This may occur
+// for example if a slave starts sending bogus TMs.
+const double master_impersonation_p = 0.001;
+
+// Conditional probability that a fault is contained in a slave region given
+// that the slave region has failed.
+const double slave_region_coverage =
+    (1 - babbling_idiot_p - master_impersonation_p);
+
+module slave_region
+
+	// Number of non-faulty slaves.
+	slave_count : [0..NUM_SLAVES] init NUM_SLAVES;
+	uncovered_slave_fault_occurred : bool init false;
+
+	[] slave_count >= MIN_SLAVES ->
+		// Failure of a single slave that is covered.
+		slave_count * slave_region_fr * slave_region_coverage:
+			(slave_count'=slave_count-1) +
+		// Failure of a single slave that is NOT covered.
+		slave_count * slave_region_fr * (1 - slave_region_coverage):
+			(slave_count'=slave_count-1) &
+			(uncovered_slave_fault_occurred'=true);
+
+endmodule
+
+
+// Failure rate of switch with embedded FTT master.
+const double switch_fr = 1/(8 * SEC_PER_MONTH);
+
+module switch
+
+	switch_is_faulty : bool init false;
+
+	[] !switch_is_faulty ->
+		switch_fr : (switch_is_faulty'=true);
+
+endmodule
+
+
+// Number of required slaves for correct operation is exhausted.
+formula slaves_exhausted = (slave_count<MIN_SLAVES);
+// The system has suffered a failure.
+formula sys_failure = slaves_exhausted | switch_is_faulty |
+    uncovered_slave_fault_occurred;
+
+// We need a label version of sys_failure because parametric
+// model checking only works with labels and not with formulas.
+label "sys_fail" = sys_failure;
+
+rewards "mission_time_rw_minutes"
+	!sys_failure: 1/SEC_PER_MINUTE;
+endrewards
+
+rewards "mission_time_rw_hours"
+	!sys_failure: 1/SEC_PER_HOUR;
+endrewards
+
+rewards "mission_time_rw_days"
+	!sys_failure: 1/SEC_PER_DAY;
+endrewards
