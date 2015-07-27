@@ -75,14 +75,4 @@ formula sys_failure = slaves_exhausted | switch_is_faulty |
 // model checking only works with labels and not with formulas.
 label "sys_fail" = sys_failure;
 
-rewards "mission_time_rw_minutes"
-	!sys_failure: 1/SEC_PER_MINUTE;
-endrewards
-
-rewards "mission_time_rw_hours"
-	!sys_failure: 1/SEC_PER_HOUR;
-endrewards
-
-rewards "mission_time_rw_days"
-	!sys_failure: 1/SEC_PER_DAY;
-endrewards
+INCLUDE ../rewards.inc
