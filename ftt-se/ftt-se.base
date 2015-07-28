@@ -39,7 +39,7 @@ module slave_region
 
 	// Number of non-faulty slaves.
 	slave_count : [0..NUM_SLAVES] init NUM_SLAVES;
-	uncovered_slave_fault_occurred : bool init false;
+	uncovered_slave_region_fault_occurred : bool init false;
 
 	[] slave_count >= MIN_SLAVES ->
 		// Failure of a single slave that is covered.
@@ -48,7 +48,7 @@ module slave_region
 		// Failure of a single slave that is NOT covered.
 		slave_count * slave_region_fr * (1 - slave_region_coverage):
 			(slave_count'=slave_count-1) &
-			(uncovered_slave_fault_occurred'=true);
+			(uncovered_slave_region_fault_occurred'=true);
 
 endmodule
 
@@ -79,7 +79,7 @@ endmodule
 formula slaves_exhausted = (slave_count<MIN_SLAVES);
 // The system has suffered a failure.
 formula sys_failure = slaves_exhausted | master_switch_region_is_faulty |
-    uncovered_slave_fault_occurred;
+    uncovered_slave_region_fault_occurred;
 
 // We need a label version of sys_failure because parametric
 // model checking only works with labels and not with formulas.
