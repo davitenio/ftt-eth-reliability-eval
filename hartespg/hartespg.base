@@ -1,0 +1,90 @@
+// Model of HaRTES: single switch with embedded master.
+
+ctmc
+
+
+INCLUDE ../common.inc
+
+// Failure rate of slave nodes.
+const double slave_node_fr = 1/(6 * SEC_PER_MONTH);
+// Failure rate of slave port.
+const double slave_port_fr = 1/(24 * SEC_PER_MONTH);
+// Failure rate of slave cable.
+const double slave_cable_fr = 1/(48 * SEC_PER_MONTH);
+// Failure rate of switch port.
+const double switch_port_fr = 1/(24 * SEC_PER_MONTH);
+// Failure rate of a port guardian.
+const double portguardian_fr = 1/(24 * SEC_PER_MONTH);
+// Failure rate of slave region.
+const double slave_region_fr = slave_node_fr + slave_port_fr +
+	slave_cable_fr + switch_port_fr + ec_corruption_r + portguardian_fr;
+
+
+// Babbling idiot failure mode probability, i.e., conditional probability that
+// given that a slave region fails, the failure mode is a babbling idiot that
+// causes a global failure. This may occur for example if the babbling idiot
+// failure prevents TMs from reaching the slaves in time.
+// This failure mode is covered by the port guardians.
+const double babbling_idiot_p = 0;
+// Master impersonation failure mode probability, i.e., conditional probability
+// that given that a slave region fails, the failure mode is a slave
+// impersonating as a master and this causes a global failure. This may occur
+// for example if a slave starts sending bogus TMs.
+// This failure mode is also covered by the port guardians.
+const double master_impersonation_p = 0;
+// Catastrophic port guardian failure mode probability, i.e., conditional
+// probability that given that a slave region fails, the failure mode is a port
+// guardian failing in such a way that it causes the switch to which it is
+// attached to fail. This in turn causes a global failure since we only have
+// one switch.
+const double catastrophic_portguardian_failure_p = 0.1;
+
+// Conditional probability that a fault is contained in a slave region given
+// that the slave region has failed.
+const double slave_region_coverage =
+	(1 - babbling_idiot_p - master_impersonation_p -
+	 catastrophic_portguardian_failure_p);
+
+
+module slave_region
+
+	// Number of non-faulty slaves.
+	slave_count : [0..NUM_SLAVES] init NUM_SLAVES;
+	uncovered_slave_region_fault_occurred : bool init false;
+
+	[] slave_count >= MIN_SLAVES ->
+		// Failure of a single slave that is covered.
+		slave_count * slave_region_fr * slave_region_coverage:
+			(slave_count'=slave_count-1) +
+		// Failure of a single slave that is NOT covered.
+		slave_count * slave_region_fr * (1 - slave_region_coverage):
+			(slave_count'=slave_count-1) &
+			(uncovered_slave_region_fault_occurred'=true);
+
+endmodule
+
+
+// Failure rate of switch with embedded FTT master.
+const double switch_fr = 1/(8 * SEC_PER_MONTH);
+
+module switch
+
+	switch_is_faulty : bool init false;
+
+	[] !switch_is_faulty ->
+		switch_fr : (switch_is_faulty'=true);
+
+endmodule
+
+
+// Number of required slaves for correct operation is exhausted.
+formula slaves_exhausted = (slave_count<MIN_SLAVES);
+// The system has suffered a failure.
+formula sys_failure = slaves_exhausted | switch_is_faulty |
+    uncovered_slave_region_fault_occurred;
+
+// We need a label version of sys_failure because parametric
+// model checking only works with labels and not with formulas.
+label "sys_fail" = sys_failure;
+
+INCLUDE ../rewards.inc
