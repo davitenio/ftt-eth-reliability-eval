@@ -1,0 +1,127 @@
+// Model of FTTRS: two interconnected switches with an embedded master each and
+// port guardians.
+
+ctmc
+
+
+INCLUDE ../common.inc
+
+// Failure rate of slave nodes.
+const double slave_node_fr = 1/(6 * SEC_PER_MONTH);
+
+
+module slave_nodes
+
+	// Number of non-faulty slave nodes attached to both switches: switch A and
+	// switch B.
+	slave_AB_count : [0..NUM_SLAVES] init NUM_SLAVES;
+	// Number of non-faulty slave nodes attached to switch A only.
+	slave_A_count : [0..NUM_SLAVES] init 0;
+	// Number of non-faulty slave nodes attached to switch B only.
+	slave_B_count : [0..NUM_SLAVES] init 0;
+
+	[slave_AB_failed] slave_AB_count > 0 ->
+		slave_AB_count * slave_node_fr:
+			(slave_AB_count'=slave_AB_count-1);
+
+	[slave_A_failed] slave_A_count > 0 ->
+		slave_A_count * slave_node_fr:
+			(slave_A_count'=slave_A_count-1);
+
+	[slave_B_failed] slave_B_count > 0 ->
+		slave_B_count * slave_node_fr:
+			(slave_B_count'=slave_B_count-1);
+
+endmodule
+
+
+// Failure rate of slave port.
+const double slave_port_fr = 1/(24 * SEC_PER_MONTH);
+// Failure rate of ethernet cable.
+const double eth_cable_fr = 1/(48 * SEC_PER_MONTH);
+// Failure rate of switch port.
+const double switch_port_fr = 1/(24 * SEC_PER_MONTH);
+// Failure rate of a port guardian.
+const double portguardian_fr = 1/(24 * SEC_PER_MONTH);
+// Slave link failure rate.
+const double slave_link_fr = slave_port_fr + eth_cable_fr + switch_port_fr +
+	ec_corruption_r + portguardian_fr;
+
+module slave_links
+
+	// Number of non-faulty links connecting some slave to switch A.
+    link_A_count : [0..NUM_SLAVES] init NUM_SLAVES;
+	// Number of non-faulty links connecting some slave to switch B.
+    link_B_count : [0..NUM_SLAVES] init NUM_SLAVES;
+
+    [slave_AB_failed] link_A_count > 0 ->
+		1: (link_A_count'=link_A_count-1);
+
+    [slave_AB_failed] link_B_count > 0 ->
+		1: (link_B_count'=link_B_count-1);
+
+    [slave_A_failed] link_A_count > 0 ->
+		1: (link_A_count'=link_A_count-1);
+
+    [slave_B_failed] link_B_count > 0 ->
+		1: (link_B_count'=link_B_count-1);
+
+	[link_A_failed] link_A_count > 0 ->
+		link_A_count * slave_link_fr:
+			(link_A_count'=link_A_count-1);
+
+endmodule
+
+
+// Failure rate of master.
+const double master_fr = 1/(12 * SEC_PER_MONTH);
+// Failure rate of switch.
+const double switch_fr = 1/(12 * SEC_PER_MONTH);
+// Failure rate of switch region.
+const double switch_region_fr = master_fr + switch_fr;
+
+const int NUM_SWITCHES = 2;
+
+module switch_A
+
+	switch_A_is_faulty : bool init false;
+
+	[] !switch_A_is_faulty ->
+		switch_region_fr : (switch_A_is_faulty'=true);
+
+endmodule
+
+
+module switch_B = switch_A [switch_A_is_faulty = switch_B_is_faulty] endmodule
+
+
+const int NUM_INTERLINKS = 2;
+
+const double interlink_region_fr = eth_cable_fr + 2*switch_port_fr;
+
+module interlink_region
+
+	interlink_count : [0..NUM_INTERLINKS] init NUM_INTERLINKS;
+
+	[] interlink_count > 0 ->
+		interlink_count * interlink_region_fr:
+			(interlink_count'=interlink_count-1);
+
+endmodule
+
+
+// Number of required slaves for correct operation is exhausted.
+formula slaves_exhausted = (slave_AB_count<MIN_SLAVES);
+// Number of required switches for correct operation is exhausted.
+formula switches_exhausted = (switch_A_is_faulty & switch_B_is_faulty);
+// Number of required interlinks for correct operation is exhausted.
+formula interlinks_exhausted = (interlink_count=0);
+// The system has suffered a failure.
+formula sys_failure = slaves_exhausted | switches_exhausted |
+	interlinks_exhausted;
+
+// We need a label version of sys_failure because parametric
+// model checking only works with labels and not with formulas.
+label "sys_fail" = sys_failure;
+
+INCLUDE ../rewards.inc
