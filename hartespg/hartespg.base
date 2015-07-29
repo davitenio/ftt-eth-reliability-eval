@@ -1,4 +1,4 @@
-// Model of HaRTES: single switch with embedded master.
+// Model of HaRTES/PG: single switch with embedded master and port guardians.
 
 ctmc
 
