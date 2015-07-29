@@ -52,15 +52,19 @@ module slave_region
 endmodule
 
 
-// Failure rate of switch with embedded FTT master.
-const double switch_fr = 1/(8 * SEC_PER_MONTH);
+// Failure rate of master.
+const double master_fr = 1/(12 * SEC_PER_MONTH);
+// Failure rate of switch.
+const double switch_fr = 1/(12 * SEC_PER_MONTH);
+// Failure rate of switch region.
+const double master_switch_region_fr = master_fr + switch_fr;
 
-module switch
+module master_switch_region
 
-	switch_is_faulty : bool init false;
+	master_switch_region_is_faulty : bool init false;
 
-	[] !switch_is_faulty ->
-		switch_fr : (switch_is_faulty'=true);
+	[] !master_switch_region_is_faulty ->
+		master_switch_region_fr : (master_switch_region_is_faulty'=true);
 
 endmodule
 
@@ -68,7 +72,7 @@ endmodule
 // Number of required slaves for correct operation is exhausted.
 formula slaves_exhausted = (slave_count<MIN_SLAVES);
 // The system has suffered a failure.
-formula sys_failure = slaves_exhausted | switch_is_faulty |
+formula sys_failure = slaves_exhausted | master_switch_region_is_faulty |
     uncovered_slave_region_fault_occurred;
 
 // We need a label version of sys_failure because parametric
