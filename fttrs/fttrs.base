@@ -52,6 +52,15 @@ const double slave_link_fr = slave_port_fr + eth_cable_fr + switch_port_fr +
 const int LINKS_PER_SLAVE = 2;
 const int MAX_LINKS = NUM_SLAVES * LINKS_PER_SLAVE;
 
+// Total number of non-faulty slaves.
+formula total_slave_count = (slave_2x_count + slave_1x_count);
+// Percentage (expressed as a fraction) of non-faulty slaves that are attached
+// to both switches.
+formula slave_2x_fraction = (slave_2x_count/total_slave_count);
+// Percentage (expressed as a fraction) of non-faulty slaves that are attached
+// to one switch only.
+formula slave_1x_fraction = (slave_1x_count/total_slave_count);
+
 module slave_links
 
 	// Number of non-faulty slave links.
@@ -63,12 +72,12 @@ module slave_links
 	[slave_1x_failed] link_count > 0 ->
 		1: (link_count'=link_count-1);
 
-	[link_of_slave_2x_failed] link_count >= LINKS_PER_SLAVE ->
-		0.5 * link_count * slave_link_fr:
+	[link_of_slave_2x_failed] link_count > 0 ->
+		slave_2x_fraction * link_count * slave_link_fr:
 			(link_count'=link_count-LINKS_PER_SLAVE);
 
-	[link_of_slave_1x_failed] link_count >= LINKS_PER_SLAVE ->
-		0.5 * link_count * slave_link_fr:
+	[link_of_slave_1x_failed] link_count > 0 ->
+		slave_1x_fraction * link_count * slave_link_fr:
 			(link_count'=link_count-1);
 
 endmodule
