@@ -9,6 +9,8 @@ INCLUDE ../common.inc
 // Failure rate of slave nodes.
 const double slave_node_fr = 1/(6 * SEC_PER_MONTH);
 
+// Total number of non-faulty slaves.
+formula total_slave_count = (slave_2x_count + slave_1x_count);
 
 module slave_nodes
 
@@ -18,12 +20,12 @@ module slave_nodes
 	slave_1x_count : [0..NUM_SLAVES] init 0;
 
 	[slave_2x_failed] slave_2x_count > 0 &
-		slave_1x_count + slave_2x_count > MIN_SLAVES ->
+		total_slave_count > MIN_SLAVES ->
 			slave_2x_count * slave_node_fr:
 				(slave_2x_count'=slave_2x_count-1);
 
 	[slave_1x_failed] slave_1x_count > 0 &
-		slave_1x_count + slave_2x_count > MIN_SLAVES ->
+		total_slave_count > MIN_SLAVES ->
 			slave_1x_count * slave_node_fr:
 				(slave_1x_count'=slave_1x_count-1);
 
@@ -52,8 +54,6 @@ const double slave_link_fr = slave_port_fr + eth_cable_fr + switch_port_fr +
 const int LINKS_PER_SLAVE = 2;
 const int MAX_LINKS = NUM_SLAVES * LINKS_PER_SLAVE;
 
-// Total number of non-faulty slaves.
-formula total_slave_count = (slave_2x_count + slave_1x_count);
 // Percentage (expressed as a fraction) of non-faulty slaves that are attached
 // to both switches.
 formula slave_2x_fraction = (slave_2x_count/total_slave_count);
@@ -121,7 +121,7 @@ endmodule
 
 
 // Number of required slaves for correct operation is exhausted.
-formula slaves_exhausted = (slave_2x_count + slave_1x_count < MIN_SLAVES);
+formula slaves_exhausted = (total_slave_count < MIN_SLAVES);
 // Number of required switches for correct operation is exhausted.
 formula switches_exhausted = (switch_A_is_faulty & switch_B_is_faulty);
 // Number of required interlinks for correct operation is exhausted.
