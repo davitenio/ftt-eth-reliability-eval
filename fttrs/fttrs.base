@@ -12,25 +12,27 @@ const double slave_node_fr = 1/(6 * SEC_PER_MONTH);
 
 module slave_nodes
 
-	// Number of non-faulty slave nodes attached to both switches: switch A and
-	// switch B.
-	slave_AB_count : [0..NUM_SLAVES] init NUM_SLAVES;
-	// Number of non-faulty slave nodes attached to switch A only.
-	slave_A_count : [0..NUM_SLAVES] init 0;
-	// Number of non-faulty slave nodes attached to switch B only.
-	slave_B_count : [0..NUM_SLAVES] init 0;
+	// Number of non-faulty slave nodes attached to both switches.
+	slave_2x_count : [0..NUM_SLAVES] init NUM_SLAVES;
+	// Number of non-faulty slave nodes attached to one switch only.
+	slave_1x_count : [0..NUM_SLAVES] init 0;
 
-	[slave_AB_failed] slave_AB_count > 0 ->
-		slave_AB_count * slave_node_fr:
-			(slave_AB_count'=slave_AB_count-1);
+	[slave_2x_failed] slave_2x_count > 0 &
+		slave_1x_count + slave_2x_count > MIN_SLAVES ->
+			slave_2x_count * slave_node_fr:
+				(slave_2x_count'=slave_2x_count-1);
 
-	[slave_A_failed] slave_A_count > 0 ->
-		slave_A_count * slave_node_fr:
-			(slave_A_count'=slave_A_count-1);
+	[slave_1x_failed] slave_1x_count > 0 &
+		slave_1x_count + slave_2x_count > MIN_SLAVES ->
+			slave_1x_count * slave_node_fr:
+				(slave_1x_count'=slave_1x_count-1);
 
-	[slave_B_failed] slave_B_count > 0 ->
-		slave_B_count * slave_node_fr:
-			(slave_B_count'=slave_B_count-1);
+	[link_of_slave_2x_failed] slave_2x_count > 0 ->
+		1 : (slave_2x_count'=slave_2x_count-1) &
+			(slave_1x_count'=slave_1x_count+1);
+
+	[link_of_slave_1x_failed] slave_1x_count > 0 ->
+		1 : (slave_1x_count'=slave_1x_count-1);
 
 endmodule
 
@@ -47,28 +49,27 @@ const double portguardian_fr = 1/(24 * SEC_PER_MONTH);
 const double slave_link_fr = slave_port_fr + eth_cable_fr + switch_port_fr +
 	ec_corruption_r + portguardian_fr;
 
+const int LINKS_PER_SLAVE = 2;
+const int MAX_LINKS = NUM_SLAVES * LINKS_PER_SLAVE;
+
 module slave_links
 
-	// Number of non-faulty links connecting some slave to switch A.
-    link_A_count : [0..NUM_SLAVES] init NUM_SLAVES;
-	// Number of non-faulty links connecting some slave to switch B.
-    link_B_count : [0..NUM_SLAVES] init NUM_SLAVES;
+	// Number of non-faulty slave links.
+	link_count : [0..MAX_LINKS] init MAX_LINKS;
 
-    [slave_AB_failed] link_A_count > 0 ->
-		1: (link_A_count'=link_A_count-1);
+	[slave_2x_failed] link_count > 0 ->
+		1: (link_count'=link_count-LINKS_PER_SLAVE);
 
-    [slave_AB_failed] link_B_count > 0 ->
-		1: (link_B_count'=link_B_count-1);
+	[slave_1x_failed] link_count > 0 ->
+		1: (link_count'=link_count-1);
 
-    [slave_A_failed] link_A_count > 0 ->
-		1: (link_A_count'=link_A_count-1);
+	[link_of_slave_2x_failed] link_count >= LINKS_PER_SLAVE ->
+		0.5 * link_count * slave_link_fr:
+			(link_count'=link_count-LINKS_PER_SLAVE);
 
-    [slave_B_failed] link_B_count > 0 ->
-		1: (link_B_count'=link_B_count-1);
-
-	[link_A_failed] link_A_count > 0 ->
-		link_A_count * slave_link_fr:
-			(link_A_count'=link_A_count-1);
+	[link_of_slave_1x_failed] link_count >= LINKS_PER_SLAVE ->
+		0.5 * link_count * slave_link_fr:
+			(link_count'=link_count-1);
 
 endmodule
 
@@ -111,7 +112,7 @@ endmodule
 
 
 // Number of required slaves for correct operation is exhausted.
-formula slaves_exhausted = (slave_AB_count<MIN_SLAVES);
+formula slaves_exhausted = (slave_2x_count + slave_1x_count < MIN_SLAVES);
 // Number of required switches for correct operation is exhausted.
 formula switches_exhausted = (switch_A_is_faulty & switch_B_is_faulty);
 // Number of required interlinks for correct operation is exhausted.
