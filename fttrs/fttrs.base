@@ -92,17 +92,14 @@ const double switch_region_fr = master_fr + switch_fr;
 
 const int NUM_SWITCHES = 2;
 
-module switch_A
+module switches
 
-	switch_A_is_faulty : bool init false;
+	switch_count : [0..NUM_SWITCHES] init NUM_SWITCHES;
 
-	[] !switch_A_is_faulty ->
-		switch_region_fr : (switch_A_is_faulty'=true);
+	[] switch_count > 0 ->
+		switch_region_fr : (switch_count'=switch_count-1);
 
 endmodule
-
-
-module switch_B = switch_A [switch_A_is_faulty = switch_B_is_faulty] endmodule
 
 
 const int NUM_INTERLINKS = 2;
@@ -123,7 +120,7 @@ endmodule
 // Number of required slaves for correct operation is exhausted.
 formula slaves_exhausted = (total_slave_count < MIN_SLAVES);
 // Number of required switches for correct operation is exhausted.
-formula switches_exhausted = (switch_A_is_faulty & switch_B_is_faulty);
+formula switches_exhausted = (switch_count = 0);
 // Number of required interlinks for correct operation is exhausted.
 formula interlinks_exhausted = (interlink_count=0);
 // The system has suffered a failure.
