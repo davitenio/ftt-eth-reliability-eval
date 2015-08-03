@@ -127,8 +127,7 @@ formula switches_exhausted = (switch_A_is_faulty & switch_B_is_faulty);
 // Number of required interlinks for correct operation is exhausted.
 formula interlinks_exhausted = (interlink_count=0);
 // The system has suffered a failure.
-formula sys_failure = slaves_exhausted | switches_exhausted |
-	interlinks_exhausted;
+formula sys_failure = slaves_exhausted | switches_exhausted;
 
 // We need a label version of sys_failure because parametric
 // model checking only works with labels and not with formulas.
