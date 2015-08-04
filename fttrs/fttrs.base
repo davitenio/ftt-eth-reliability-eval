@@ -29,9 +29,10 @@ module slave_nodes
 			slave_1x_count * slave_node_fr:
 				(slave_1x_count'=slave_1x_count-1);
 
-	[link_of_slave_2x_failed] slave_2x_count > 0 ->
-		1 : (slave_2x_count'=slave_2x_count-1) &
-			(slave_1x_count'=slave_1x_count+1);
+	[link_of_slave_2x_failed] slave_2x_count > 0 &
+		slave_1x_count < NUM_SLAVES ->
+			1 : (slave_2x_count'=slave_2x_count-1) &
+				(slave_1x_count'=slave_1x_count+1);
 
 	[link_of_slave_1x_failed] slave_1x_count > 0 ->
 		1 : (slave_1x_count'=slave_1x_count-1);
@@ -66,17 +67,18 @@ module slave_links
 	// Number of non-faulty slave links.
 	link_count : [0..MAX_LINKS] init MAX_LINKS;
 
-	[slave_2x_failed] link_count > 0 ->
+	[slave_2x_failed] link_count > LINKS_PER_SLAVE ->
 		1: (link_count'=link_count-LINKS_PER_SLAVE);
 
 	[slave_1x_failed] link_count > 0 ->
 		1: (link_count'=link_count-1);
 
-	[link_of_slave_2x_failed] link_count > 0 ->
+	[link_of_slave_2x_failed] slave_2x_count > 0 &
+		slave_1x_count < NUM_SLAVES & link_count > LINKS_PER_SLAVE ->
 		slave_2x_fraction * link_count * slave_link_fr:
 			(link_count'=link_count-LINKS_PER_SLAVE);
 
-	[link_of_slave_1x_failed] link_count > 0 ->
+	[link_of_slave_1x_failed] slave_1x_count > 0 & link_count > 0 ->
 		slave_1x_fraction * link_count * slave_link_fr:
 			(link_count'=link_count-1);
 
