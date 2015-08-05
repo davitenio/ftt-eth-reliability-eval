@@ -4,3 +4,4 @@ A [ G (total_slave_count <= NUM_SLAVES) ]
 
 A [ G (total_slave_count  >= 0) ]
 
+A [ G (total_slave_count >= MIN_SLAVES - 1) ]
