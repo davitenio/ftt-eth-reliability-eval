@@ -1,5 +1,6 @@
 // Number of slaves.
-const int NUM_SLAVES;
+#const NUM_SLAVES#
+const int NUM_SLAVES = #NUM_SLAVES#;
 // Number of slaves whose failure can be tolerated.
 const int REDUNDANT_SLAVES = 1;
 // Minimum required number of slaves for the system to function.
