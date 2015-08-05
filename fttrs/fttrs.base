@@ -76,7 +76,7 @@ module slave_links
 	[link_of_slave_2x_failed] slave_2x_count > 0 &
 		slave_1x_count < NUM_SLAVES & link_count > LINKS_PER_SLAVE ->
 		slave_2x_fraction * link_count * slave_link_fr:
-			(link_count'=link_count-LINKS_PER_SLAVE);
+			(link_count'=link_count-1);
 
 	[link_of_slave_1x_failed] slave_1x_count > 0 & link_count > 0 ->
 		slave_1x_fraction * link_count * slave_link_fr:
