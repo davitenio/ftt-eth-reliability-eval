@@ -34,8 +34,9 @@ module slave_nodes
 			1 : (slave_2x_count'=slave_2x_count-1) &
 				(slave_1x_count'=slave_1x_count+1);
 
-	[link_of_slave_1x_failed] slave_1x_count > 0 ->
-		1 : (slave_1x_count'=slave_1x_count-1);
+	[link_of_slave_1x_failed] slave_1x_count > 0 &
+		total_slave_count > MIN_SLAVES ->
+			1 : (slave_1x_count'=slave_1x_count-1);
 
 endmodule
 
