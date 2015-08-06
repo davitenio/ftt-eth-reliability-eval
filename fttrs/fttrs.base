@@ -78,13 +78,14 @@ module slave_nodes
 	[switch_failed] switch_count = 2 &
 		slave_1x_count >= #i# &
 		slave_1x_count <= NUM_SLAVES - slave_2x_count &
-		link_count > #i# ->
+		link_count > slave_2x_count + #i# ->
 			1 : (slave_2x_count'=0) &
-				(slave_1x_count'=slave_2x_count + slave_1x_count - #i#);
+				(slave_1x_count'=slave_2x_count + slave_1x_count - #i#) &
+				(link_count'=link_count - slave_2x_count - #i#);
 #end#
 
 	[switch_failed] switch_count = 1 ->
-		1 : (slave_2x_count'=0) & (slave_1x_count'=0);
+		1 : (slave_2x_count'=0) & (slave_1x_count'=0) & (link_count'=0);
 
 endmodule
 
