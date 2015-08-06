@@ -77,6 +77,7 @@ module slave_nodes
 #for i=0:NUM_SLAVES#
 	[switch_failed] switch_count = 2 &
 		slave_1x_count >= #i# &
+		slave_1x_count <= NUM_SLAVES - slave_2x_count &
 		link_count > #i# ->
 			1 : (slave_2x_count'=0) &
 				(slave_1x_count'=slave_2x_count + slave_1x_count - #i#);
