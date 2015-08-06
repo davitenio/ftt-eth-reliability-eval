@@ -84,9 +84,6 @@ module slave_nodes
 				(link_count'=link_count - slave_2x_count - #i#);
 #end#
 
-	[switch_failed] switch_count = 1 ->
-		1 : (slave_2x_count'=0) & (slave_1x_count'=0) & (link_count'=0);
-
 endmodule
 
 
