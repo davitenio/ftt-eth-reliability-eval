@@ -36,7 +36,7 @@ const double ec_duration = 1 * SEC_PER_MILLISEC;
 const double ec_r = 1/ec_duration;
 
 // Exponent for bit error ratio.
-const double bit_error_ratio_exponent;
+const double bit_error_ratio_exponent = 6;
 // Bit error ratio: 1 bit lost out of 10^bit_error_ratio_exponent,
 // e.g., if bit_error_ratio_exponent = 6, then 1 bit is lost out of 10^6 =
 // 1,000,000 bits.
