@@ -1,7 +1,12 @@
 A [ G link_count=(LINKS_PER_SLAVE*slave_2x_count+slave_1x_count) ]
 
-A [ G (total_slave_count <= NUM_SLAVES) ]
+A [ G (total_slave_count<=NUM_SLAVES) ]
 
-A [ G (total_slave_count  >= 0) ]
+A [ G (total_slave_count>=0) ]
 
-A [ G (total_slave_count >= MIN_SLAVES - 1) ]
+A [ G (total_slave_count>=MIN_SLAVES-1) ]
+
+A [ G (switch_count < 2) => (slave_2x_count = 0) ]
+
+A [ G (switch_count = 1) => (link_count = slave_1x_count) ]
+
