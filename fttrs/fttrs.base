@@ -118,6 +118,9 @@ module interlink_region
 		interlink_count * interlink_region_fr:
 			(interlink_count'=interlink_count-1);
 
+	[switch_failed] true ->
+		1 : (interlink_count'=0);
+
 endmodule
 
 
