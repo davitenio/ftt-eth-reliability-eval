@@ -12,42 +12,6 @@ const double slave_node_fr = 1/(6 * SEC_PER_MONTH);
 // Total number of non-faulty slaves.
 formula total_slave_count = (slave_2x_count + slave_1x_count);
 
-module slave_nodes
-
-	// Number of non-faulty slave nodes attached to both switches.
-	slave_2x_count : [0..NUM_SLAVES] init NUM_SLAVES;
-	// Number of non-faulty slave nodes attached to one switch only.
-	slave_1x_count : [0..NUM_SLAVES] init 0;
-
-	[slave_2x_failed] slave_2x_count > 0 &
-		total_slave_count >= MIN_SLAVES ->
-			slave_2x_count * slave_node_fr:
-				(slave_2x_count'=slave_2x_count-1);
-
-	[slave_1x_failed] slave_1x_count > 0 &
-		total_slave_count >= MIN_SLAVES ->
-			slave_1x_count * slave_node_fr:
-				(slave_1x_count'=slave_1x_count-1);
-
-	[link_of_slave_2x_failed] slave_2x_count > 0 &
-		slave_1x_count < NUM_SLAVES ->
-			1 : (slave_2x_count'=slave_2x_count-1) &
-				(slave_1x_count'=slave_1x_count+1);
-
-	[link_of_slave_1x_failed] slave_1x_count > 0 &
-		total_slave_count >= MIN_SLAVES ->
-			1 : (slave_1x_count'=slave_1x_count-1);
-
-#for i=0:NUM_SLAVES#
-	[switch_failed] switch_count = 2 & slave_1x_count >= #i# ->
-		1 : (slave_2x_count'=0) & (slave_1x_count'=slave_1x_count-#i#);
-#end#
-
-	[switch_failed] switch_count = 1 ->
-		1 : (slave_2x_count'=0) & (slave_1x_count'=0);
-
-endmodule
-
 
 // Failure rate of slave port.
 const double slave_port_fr = 1/(24 * SEC_PER_MONTH);
@@ -71,25 +35,55 @@ formula slave_2x_fraction = (slave_2x_count/total_slave_count);
 // to one switch only.
 formula slave_1x_fraction = (slave_1x_count/total_slave_count);
 
-module slave_links
 
+module slave_nodes
+
+	// Number of non-faulty slave nodes attached to both switches.
+	slave_2x_count : [0..NUM_SLAVES] init NUM_SLAVES;
+	// Number of non-faulty slave nodes attached to one switch only.
+	slave_1x_count : [0..NUM_SLAVES] init 0;
 	// Number of non-faulty slave links.
 	link_count : [0..MAX_LINKS] init MAX_LINKS;
 
-	[slave_2x_failed] link_count > LINKS_PER_SLAVE ->
-		1: (link_count'=link_count-LINKS_PER_SLAVE);
+	[slave_2x_failed] slave_2x_count > 0 &
+		total_slave_count >= MIN_SLAVES &
+		link_count > LINKS_PER_SLAVE ->
+			slave_2x_count * slave_node_fr:
+				(slave_2x_count'=slave_2x_count-1) &
+				(link_count'=link_count-LINKS_PER_SLAVE);
 
-	[slave_1x_failed] link_count > 0 ->
-		1: (link_count'=link_count-1);
+	[slave_1x_failed] slave_1x_count > 0 &
+		total_slave_count >= MIN_SLAVES &
+		link_count > 0 ->
+			slave_1x_count * slave_node_fr:
+				(slave_1x_count'=slave_1x_count-1) &
+				(link_count'=link_count-1);
 
 	[link_of_slave_2x_failed] slave_2x_count > 0 &
-		slave_1x_count < NUM_SLAVES & link_count > LINKS_PER_SLAVE ->
-		slave_2x_fraction * link_count * slave_link_fr:
-			(link_count'=link_count-1);
+		slave_1x_count < NUM_SLAVES &
+		link_count > LINKS_PER_SLAVE ->
+			slave_2x_fraction * link_count * slave_link_fr:
+				(slave_2x_count'=slave_2x_count-1) &
+				(slave_1x_count'=slave_1x_count+1) &
+				(link_count'=link_count-1);
 
-	[link_of_slave_1x_failed] slave_1x_count > 0 & link_count > 0 ->
-		slave_1x_fraction * link_count * slave_link_fr:
-			(link_count'=link_count-1);
+	[link_of_slave_1x_failed] slave_1x_count > 0 &
+		total_slave_count >= MIN_SLAVES &
+		link_count > 0 ->
+			slave_1x_fraction * link_count * slave_link_fr:
+				(slave_1x_count'=slave_1x_count-1) &
+				(link_count'=link_count-1);
+
+#for i=0:NUM_SLAVES#
+	[switch_failed] switch_count = 2 &
+		slave_1x_count >= #i# &
+		link_count > #i# ->
+			1 : (slave_2x_count'=0) &
+				(slave_1x_count'=slave_1x_count-#i#);
+#end#
+
+	[switch_failed] switch_count = 1 ->
+		1 : (slave_2x_count'=0) & (slave_1x_count'=0);
 
 endmodule
 
