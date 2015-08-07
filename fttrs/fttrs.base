@@ -113,7 +113,8 @@ module switches
 
 	[switch_failed] switch_count > 0 &
 			total_slave_count >= MIN_SLAVES ->
-				switch_region_fr : (switch_count'=switch_count-1);
+				switch_count * switch_region_fr :
+					(switch_count'=switch_count-1);
 
 	[all_interlinks_failed] true ->
 		1 : (switch_count'=1);
