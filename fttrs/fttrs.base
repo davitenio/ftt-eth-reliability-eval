@@ -81,7 +81,7 @@ module slave_nodes
 		slave_1x_count <= NUM_SLAVES - slave_2x_count &
 		link_count >= slave_2x_count + #i# ->
 			1 : (slave_2x_count'=0) &
-				(slave_1x_count'=slave_2x_count + slave_1x_count - #i#) &
+				(slave_1x_count'=total_slave_count - #i#) &
 				(link_count'=link_count - slave_2x_count - #i#);
 #end#
 
