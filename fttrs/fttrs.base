@@ -46,22 +46,22 @@ module slave_nodes
 	// Number of non-faulty slave links.
 	link_count : [0..MAX_LINKS] init MAX_LINKS;
 
-	[slave_2x_failed] slave_2x_count > 0 &
-		!sys_failure &
+	[slave_2x_failed] !sys_failure &
+		slave_2x_count > 0 &
 		link_count > LINKS_PER_SLAVE ->
 			slave_2x_count * slave_node_fr:
 				(slave_2x_count'=slave_2x_count-1) &
 				(link_count'=link_count-LINKS_PER_SLAVE);
 
-	[slave_1x_failed] slave_1x_count > 0 &
-		!sys_failure &
+	[slave_1x_failed] !sys_failure &
+		slave_1x_count > 0 &
 		link_count > 0 ->
 			slave_1x_count * slave_node_fr:
 				(slave_1x_count'=slave_1x_count-1) &
 				(link_count'=link_count-1);
 
-	[link_of_slave_2x_failed] slave_2x_count > 0 &
-		!sys_failure &
+	[link_of_slave_2x_failed] !sys_failure &
+		slave_2x_count > 0 &
 		slave_1x_count < NUM_SLAVES &
 		link_count > LINKS_PER_SLAVE ->
 			slave_2x_fraction * link_count * slave_link_fr:
@@ -69,16 +69,16 @@ module slave_nodes
 				(slave_1x_count'=slave_1x_count+1) &
 				(link_count'=link_count-1);
 
-	[link_of_slave_1x_failed] slave_1x_count > 0 &
-		!sys_failure &
+	[link_of_slave_1x_failed] !sys_failure &
+		slave_1x_count > 0 &
 		link_count > 0 ->
 			slave_1x_fraction * link_count * slave_link_fr:
 				(slave_1x_count'=slave_1x_count-1) &
 				(link_count'=link_count-1);
 
 #for i=0:NUM_SLAVES#
-	[switch_failed] switch_count = NUM_SWITCHES &
-		!sys_failure &
+	[switch_failed] !sys_failure &
+		switch_count = NUM_SWITCHES &
 		slave_1x_count >= #i# &
 		slave_1x_count <= NUM_SLAVES - slave_2x_count &
 		link_count >= slave_2x_count + #i# ->
@@ -88,8 +88,8 @@ module slave_nodes
 #end#
 
 #for i=0:NUM_SLAVES#
-	[all_interlinks_failed] switch_count = NUM_SWITCHES &
-		!sys_failure &
+	[all_interlinks_failed] !sys_failure &
+		switch_count = NUM_SWITCHES &
 		slave_1x_count >= #i# &
 		slave_1x_count <= NUM_SLAVES - slave_2x_count &
 		link_count >= slave_2x_count + #i# ->
@@ -112,13 +112,13 @@ module switches
 
 	switch_count : [0..NUM_SWITCHES] init NUM_SWITCHES;
 
-	[switch_failed] switch_count > 1 &
-			!sys_failure ->
+	[switch_failed] !sys_failure &
+			 switch_count > 1 ->
 				switch_count * switch_region_fr :
 					(switch_count'=switch_count-1);
 
-	[all_switches_failed] switch_count = 1 &
-			!sys_failure ->
+	[all_switches_failed] !sys_failure &
+			 switch_count = 1 ->
 				switch_region_fr :
 					(switch_count'=0);
 
@@ -136,13 +136,13 @@ module interlink_region
 
 	interlink_count : [0..NUM_INTERLINKS] init NUM_INTERLINKS;
 
-	[single_interlink_failed] interlink_count > 1 &
-			!sys_failure ->
+	[single_interlink_failed] !sys_failure &
+			 interlink_count > 1 ->
 				interlink_count * interlink_region_fr:
 					(interlink_count'=interlink_count-1);
 
-	[all_interlinks_failed] interlink_count = 1 &
-			!sys_failure ->
+	[all_interlinks_failed] !sys_failure &
+			 interlink_count = 1 ->
 				interlink_count * interlink_region_fr:
 					(interlink_count'=0);
 
