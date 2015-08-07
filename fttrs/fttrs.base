@@ -26,7 +26,7 @@ const double slave_link_fr = slave_port_fr + eth_cable_fr + switch_port_fr +
 	ec_corruption_r + portguardian_fr;
 
 const int LINKS_PER_SLAVE = 2;
-const int MAX_LINKS = NUM_SLAVES * LINKS_PER_SLAVE;
+const int NUM_LINKS = NUM_SLAVES * LINKS_PER_SLAVE;
 
 // Percentage (expressed as a fraction) of non-faulty slaves that are attached
 // to both switches.
@@ -44,7 +44,7 @@ module slave_nodes
 	// Number of non-faulty slave nodes attached to one switch only.
 	slave_1x_count : [0..NUM_SLAVES] init 0;
 	// Number of non-faulty slave links.
-	link_count : [0..MAX_LINKS] init MAX_LINKS;
+	link_count : [0..NUM_LINKS] init NUM_LINKS;
 
 	[slave_2x_failed] !sys_failure &
 		slave_2x_count > 0 &
