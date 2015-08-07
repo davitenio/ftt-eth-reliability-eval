@@ -130,20 +130,20 @@ endmodule
 
 const int NUM_INTERLINKS = 2;
 
-const double interlink_region_fr = eth_cable_fr + 2*switch_port_fr;
+const double interlink_fr = eth_cable_fr + 2*switch_port_fr;
 
-module interlink_region
+module interlinks
 
 	interlink_count : [0..NUM_INTERLINKS] init NUM_INTERLINKS;
 
 	[single_interlink_failed] !sys_failure &
 			 interlink_count > 1 ->
-				interlink_count * interlink_region_fr:
+				interlink_count * interlink_fr:
 					(interlink_count'=interlink_count-1);
 
 	[all_interlinks_failed] !sys_failure &
 			 interlink_count = 1 ->
-				interlink_count * interlink_region_fr:
+				interlink_count * interlink_fr:
 					(interlink_count'=0);
 
 	[switch_failed] !sys_failure ->
