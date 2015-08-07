@@ -77,7 +77,7 @@ module slave_nodes
 				(link_count'=link_count-1);
 
 #for i=0:NUM_SLAVES#
-	[switch_failed] !sys_failure &
+	[redundant_switch_failed] !sys_failure &
 		switch_count = NUM_SWITCHES &
 		slave_1x_count >= #i# &
 		slave_1x_count <= NUM_SLAVES - slave_2x_count &
@@ -112,7 +112,7 @@ module switches
 
 	switch_count : [0..NUM_SWITCHES] init NUM_SWITCHES;
 
-	[switch_failed] !sys_failure &
+	[redundant_switch_failed] !sys_failure &
 			 switch_count > 1 ->
 				switch_count * switch_region_fr :
 					(switch_count'=switch_count-1);
@@ -146,7 +146,7 @@ module interlinks
 				interlink_count * interlink_fr:
 					(interlink_count'=0);
 
-	[switch_failed] !sys_failure ->
+	[redundant_switch_failed] !sys_failure ->
 		1 : (interlink_count'=0);
 
 endmodule
