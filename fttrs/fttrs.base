@@ -102,9 +102,9 @@ module switches
 	switch_count : [0..NUM_SWITCHES] init NUM_SWITCHES;
 
 	[redundant_switch_failed] !sys_failure &
-			 switch_count > 1 ->
-				switch_count * switch_region_fr :
-					(switch_count'=switch_count-1);
+		switch_count > 1 ->
+			switch_count * switch_region_fr :
+				(switch_count'=switch_count-1);
 
 	[last_switch_failed] !sys_failure &
 			 switch_count = 1 ->
@@ -123,9 +123,9 @@ module interlinks
 	interlink_count : [0..NUM_INTERLINKS] init NUM_INTERLINKS;
 
 	[interlink_failed] !sys_failure &
-			 interlink_count >= 1 ->
-				interlink_count * interlink_fr:
-					(interlink_count'=interlink_count-1);
+		 interlink_count >= 1 ->
+			interlink_count * interlink_fr:
+				(interlink_count'=interlink_count-1);
 
 	[redundant_switch_failed] !sys_failure ->
 		1 : (interlink_count'=0);
