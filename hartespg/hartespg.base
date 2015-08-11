@@ -7,8 +7,8 @@ INCLUDE ../common.inc
 
 // Failure rate of slave nodes.
 const double slave_node_fr = 1/(6 * SEC_PER_MONTH);
-// Failure rate of slave port.
-const double slave_port_fr = 1/(24 * SEC_PER_MONTH);
+// Failure rate of a node Ethernet port.
+const double node_port_fr = 1/(24 * SEC_PER_MONTH);
 // Failure rate of ethernet cable.
 const double eth_cable_fr = 1/(48 * SEC_PER_MONTH);
 // Failure rate of switch port.
@@ -16,7 +16,7 @@ const double switch_port_fr = 1/(24 * SEC_PER_MONTH);
 // Failure rate of a port guardian.
 const double portguardian_fr = 1/(24 * SEC_PER_MONTH);
 // Failure rate of slave region.
-const double slave_region_fr = slave_node_fr + slave_port_fr +
+const double slave_region_fr = slave_node_fr + node_port_fr +
 	eth_cable_fr + switch_port_fr + ec_corruption_r + portguardian_fr;
 
 

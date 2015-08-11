@@ -13,8 +13,8 @@ const double slave_node_fr = 1/(6 * SEC_PER_MONTH);
 formula total_slave_count = (slave_2x_count + slave_1x_count);
 
 
-// Failure rate of slave port.
-const double slave_port_fr = 1/(24 * SEC_PER_MONTH);
+// Failure rate of a node Ethernet port.
+const double node_port_fr = 1/(24 * SEC_PER_MONTH);
 // Failure rate of ethernet cable.
 const double eth_cable_fr = 1/(48 * SEC_PER_MONTH);
 // Failure rate of switch port.
@@ -22,7 +22,7 @@ const double switch_port_fr = 1/(24 * SEC_PER_MONTH);
 // Failure rate of a port guardian.
 const double portguardian_fr = 1/(24 * SEC_PER_MONTH);
 // Slave link failure rate.
-const double slave_link_fr = slave_port_fr + eth_cable_fr + switch_port_fr +
+const double slave_link_fr = node_port_fr + eth_cable_fr + switch_port_fr +
 	ec_corruption_r + portguardian_fr;
 
 const int LINKS_PER_SLAVE = 2;
