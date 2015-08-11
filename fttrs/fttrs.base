@@ -87,17 +87,6 @@ module slave_nodes
 				(link_count'=link_count - slave_2x_count - #i#);
 #end#
 
-#for i=0:NUM_SLAVES#
-	[last_interlink_failed] !sys_failure &
-		switch_count = NUM_SWITCHES &
-		slave_1x_count >= #i# &
-		slave_1x_count <= NUM_SLAVES - slave_2x_count &
-		link_count >= slave_2x_count + #i# ->
-			1 : (slave_2x_count'=0) &
-				(slave_1x_count'=total_slave_count - #i#) &
-				(link_count'=link_count - slave_2x_count - #i#);
-#end#
-
 endmodule
 
 
@@ -122,9 +111,6 @@ module switches
 				switch_region_fr :
 					(switch_count'=0);
 
-	[last_interlink_failed] !sys_failure ->
-		1 : (switch_count'=1);
-
 endmodule
 
 
@@ -136,15 +122,10 @@ module interlinks
 
 	interlink_count : [0..NUM_INTERLINKS] init NUM_INTERLINKS;
 
-	[single_interlink_failed] !sys_failure &
-			 interlink_count > 1 ->
+	[interlink_failed] !sys_failure &
+			 interlink_count >= 1 ->
 				interlink_count * interlink_fr:
 					(interlink_count'=interlink_count-1);
-
-	[last_interlink_failed] !sys_failure &
-			 interlink_count = 1 ->
-				interlink_count * interlink_fr:
-					(interlink_count'=0);
 
 	[redundant_switch_failed] !sys_failure ->
 		1 : (interlink_count'=0);
@@ -158,8 +139,11 @@ formula slaves_exhausted = (total_slave_count < MIN_SLAVES);
 formula switches_exhausted = (switch_count = 0);
 // Number of required interlinks for correct operation is exhausted.
 formula interlinks_exhausted = (interlink_count=0);
+// Network partition occurred
+formula partition_occurred = (interlink_count=0 & switch_count=2);
 // The system has suffered a failure.
-formula sys_failure = slaves_exhausted | switches_exhausted;
+formula sys_failure = slaves_exhausted | switches_exhausted |
+	partition_occurred;
 
 // We need a label version of sys_failure because parametric
 // model checking only works with labels and not with formulas.
