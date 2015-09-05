@@ -77,3 +77,4 @@ else: mc.plot(edge_labels=True, edge_color="gray").save('mc.png')
 state_space = mc.vertices()
 print state_space
 graphs_list.to_graphics_array(state_space).save('graphs.png')
+print mc.order()
