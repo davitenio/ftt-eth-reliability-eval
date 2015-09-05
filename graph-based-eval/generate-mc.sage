@@ -19,9 +19,15 @@ def explore(G, mc, is_faulty, *args):
         Fi = Graph(immutable=True)
         if Hi in mc.vertices():
             print "Graph {} is already in MC".format(Hi)
+            assert not mc.has_edge(Gi, Hi)
             mc.add_edge(Gi, Hi, label=str(v))
         elif is_faulty(H, *args):
-            mc.add_edge(Gi, Fi, label=str(v))
+            new_label = str(v)
+            if mc.has_edge(Gi, Fi):
+                print "MC already has edge {}".format((Gi, Hi))
+                old_label = mc.edge_label(Gi, Fi)
+                new_label = "{}, {}".format(old_label, new_label)
+            mc.add_edge(Gi, Fi, label=new_label)
         else:
             mc.add_vertex(Hi)
             mc.add_edge(Gi, Hi, label=str(v))
