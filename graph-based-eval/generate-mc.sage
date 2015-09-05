@@ -8,11 +8,20 @@ def is_faulty(G, k):
         slaves_cc2 = [v for v in cc2 if v in slaves]
     return not (len(slaves_cc1) >= k or len(slaves_cc2) >= k)
 
-def explore(G, mc, is_faulty, *args):
+def extract_vertex(G, v):
+    for n in G.neighbor_iterator(v):
+        G.delete_vertex(n)
+    G.delete_vertex(v)
+
+def explore(G, mc, extractable_vertices, is_faulty, *args):
     for v in G.vertices():
         H = G.copy()
-        H.delete_vertex(v)
-        print "Deleted vertex {}".format(v)
+        if v in extractable_vertices:
+            extract_vertex(H, v)
+            print "Extracted vertex {}".format(v)
+        else:
+            H.delete_vertex(v)
+            print "Deleted vertex {}".format(v)
         H.name(str(H.vertices()))
         Gi = G.copy(immutable=True)
         Hi = H.copy(immutable=True)
@@ -31,9 +40,9 @@ def explore(G, mc, is_faulty, *args):
         else:
             mc.add_vertex(Hi)
             mc.add_edge(Gi, Hi, label=str(v))
-            explore(H, mc, is_faulty, *args)
+            explore(H, mc, extractable_vertices, is_faulty, *args)
 
-def generate_mc(G, is_faulty, *args):
+def generate_mc(G, extractable_vertices, is_faulty, *args):
     if is_faulty(G, *args):
         return None
     mc = DiGraph()
@@ -43,7 +52,7 @@ def generate_mc(G, is_faulty, *args):
     Fi = Graph(immutable=True, name="F")
     mc.add_vertex(Gi)
     mc.add_vertex(Fi)
-    explore(G, mc, is_faulty, *args)
+    explore(G, mc, extractable_vertices, is_faulty, *args)
     return mc
 
 
@@ -61,7 +70,7 @@ for v in ['s2', 'l3', 'l4', 'l6', 'l2']:
 G.name(str(G.vertices()))
 G.plot().save('G.png')
 
-mc = generate_mc(G, is_faulty, 1)
+mc = generate_mc(G, slaves + switches, is_faulty, 1)
 if mc is None: print "Empty MC"
 else: mc.plot(edge_labels=True, edge_color="gray").save('mc.png')
 
