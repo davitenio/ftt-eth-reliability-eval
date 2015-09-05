@@ -57,7 +57,7 @@ G.plot().save('G.png')
 
 mc = generate_mc(G, is_faulty, 1)
 if mc is None: print "Empty MC"
-else: mc.plot(edge_labels=True).save('mc.png')
+else: mc.plot(edge_labels=True, edge_color="gray").save('mc.png')
 
 state_space = mc.vertices()
 print state_space
