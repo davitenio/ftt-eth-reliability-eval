@@ -1,9 +1,9 @@
 def is_faulty(G, k):
     slaves_cc1 = slaves_cc2 = []
-    if 'b1' in G.vertices():
+    if 'b1' in G.vertex_iterator():
         cc1 = G.connected_component_containing_vertex('b1')
         slaves_cc1 = [v for v in cc1 if v in slaves]
-    if 'b2' in G.vertices():
+    if 'b2' in G.vertex_iterator():
         cc2 = G.connected_component_containing_vertex('b2')
         slaves_cc2 = [v for v in cc2 if v in slaves]
     return not (len(slaves_cc1) >= k or len(slaves_cc2) >= k)
@@ -14,7 +14,7 @@ def extract_vertex(G, v):
     G.delete_vertex(v)
 
 def explore(G, mc, extractable_vertices, is_faulty, *args):
-    for v in G.vertices():
+    for v in G.vertex_iterator():
         H = G.copy()
         if v in extractable_vertices:
             extract_vertex(H, v)
@@ -22,11 +22,11 @@ def explore(G, mc, extractable_vertices, is_faulty, *args):
         else:
             H.delete_vertex(v)
             print "Deleted vertex {}".format(v)
-        H.name("-".join(H.vertices()))
+        H.name("-".join(H.vertex_iterator()))
         Gi = G.copy(immutable=True)
         Hi = H.copy(immutable=True)
         Fi = Graph(immutable=True)
-        if Hi in mc.vertices():
+        if Hi in mc.vertex_iterator():
             print "Graph {} is already in MC".format(Hi)
             assert not mc.has_edge(Gi, Hi)
             mc.add_edge(Gi, Hi, label=str(v))
