@@ -22,7 +22,7 @@ def explore(G, mc, extractable_vertices, is_faulty, *args):
         else:
             H.delete_vertex(v)
             print "Deleted vertex {}".format(v)
-        H.name(str(H.vertices()))
+        H.name("-".join(H.vertices()))
         Gi = G.copy(immutable=True)
         Hi = H.copy(immutable=True)
         Fi = Graph(immutable=True)
@@ -65,9 +65,9 @@ E = [('s1', 'l1'), ('s1', 'l2'), ('l1', 'b1'), ('l2', 'b2'),
 G = Graph(E)
 
 
-for v in ['s2', 'l3', 'l4', 'l6', 'l2']:
+for v in ['b2', 'l5', 'l4', 'l6', 'l2']:
     G.delete_vertex(v)
-G.name(str(G.vertices()))
+G.name("-".join(G.vertices()))
 G.plot().save('G.png')
 
 mc = generate_mc(G, slaves + switches, is_faulty, 1)
@@ -75,6 +75,9 @@ if mc is None: print "Empty MC"
 else: mc.plot(edge_labels=True, edge_color="gray").save('mc.png')
 
 state_space = mc.vertices()
-print state_space
+for H in state_space:
+    plot = H.plot()
+    filename = H.name() + ".png"
+    plot.save(filename)
 graphs_list.to_graphics_array(state_space).save('graphs.png')
 print mc.order()
