@@ -13,6 +13,16 @@ def extract_vertex(G, v):
         G.delete_vertex(n)
     G.delete_vertex(v)
 
+
+def add_rate(mc, src_state, dst_state, rate):
+    new_label = rate
+    if mc.has_edge(src_state, dst_state):
+        print "MC already has edge {}".format((src_state, dst_state))
+        old_label = mc.edge_label(src_state, dst_state)
+        new_label = "{}, {}".format(old_label, new_label)
+    mc.add_edge(src_state, dst_state, label=new_label)
+
+
 def explore(G, mc, extractable_vertices, is_faulty, *args):
     for v in G.vertex_iterator():
         H = G.copy()
@@ -22,25 +32,25 @@ def explore(G, mc, extractable_vertices, is_faulty, *args):
         else:
             H.delete_vertex(v)
             print "Deleted vertex {}".format(v)
+        cc_subgraphs = H.connected_components_subgraphs()
+        for cc in cc_subgraphs:
+            if is_faulty(cc, *args):
+                for cc_vertex in cc:
+                    H.delete_vertex(cc_vertex)
         H.name("-".join(H.vertex_iterator()))
         Gi = G.copy(immutable=True)
         Hi = H.copy(immutable=True)
         Fi = Graph(immutable=True)
-        if Hi in mc.vertex_iterator():
-            print "Graph {} is already in MC".format(Hi)
-            assert not mc.has_edge(Gi, Hi)
-            mc.add_edge(Gi, Hi, label=str(v))
-        elif is_faulty(H, *args):
-            new_label = str(v)
-            if mc.has_edge(Gi, Fi):
-                print "MC already has edge {}".format((Gi, Hi))
-                old_label = mc.edge_label(Gi, Fi)
-                new_label = "{}, {}".format(old_label, new_label)
-            mc.add_edge(Gi, Fi, label=new_label)
+
+        if is_faulty(H, *args):
+            add_rate(mc, Gi, Fi, str(v))
+        elif Hi in mc.vertex_iterator():
+            add_rate(mc, Gi, Hi, str(v))
         else:
             mc.add_vertex(Hi)
-            mc.add_edge(Gi, Hi, label=str(v))
+            add_rate(mc, Gi, Hi, str(v))
             explore(H, mc, extractable_vertices, is_faulty, *args)
+
 
 def generate_mc(G, extractable_vertices, is_faulty, *args):
     if is_faulty(G, *args):
