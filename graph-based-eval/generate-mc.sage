@@ -1,12 +1,23 @@
-def is_faulty(G, k):
-    slaves_cc1 = slaves_cc2 = []
+def is_faulty(G, num_necessary_slaves):
+    """
+    num_necessary_slaves: minimum number of slaves that must be connected to
+    each other in graph G for G not to be faulty.
+    """
+    num_slaves_cc1 = num_slaves_cc2 = 0
     if 'b1' in G.vertex_iterator():
         cc1 = G.connected_component_containing_vertex('b1')
-        slaves_cc1 = [v for v in cc1 if v in slaves]
+        for v in cc1:
+            if v in slaves:
+                num_slaves_cc1 = num_slaves_cc1 + 1
     if 'b2' in G.vertex_iterator():
         cc2 = G.connected_component_containing_vertex('b2')
-        slaves_cc2 = [v for v in cc2 if v in slaves]
-    return not (len(slaves_cc1) >= k or len(slaves_cc2) >= k)
+        for v in cc2:
+            if v in slaves:
+                num_slaves_cc2 = num_slaves_cc2 + 1
+    return not (
+        num_slaves_cc1 >= num_necessary_slaves or
+        num_slaves_cc2 >= num_necessary_slaves)
+
 
 def extract_vertex(G, v):
     for n in G.neighbor_iterator(v):
