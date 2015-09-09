@@ -20,12 +20,12 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     else:
         graph_pos=nx.spring_layout(graph)
 
-    nx.draw_networkx_nodes(graph,graph_pos,node_size=node_size,
+    nx.draw_networkx_nodes(graph, graph_pos, node_size=node_size,
                            alpha=node_alpha, node_color=node_color, ax=axis)
-    nx.draw_networkx_edges(graph,graph_pos,width=edge_tickness,
-                           alpha=edge_alpha,edge_color=edge_color,
+    nx.draw_networkx_edges(graph, graph_pos, width=edge_tickness,
+                           alpha=edge_alpha, edge_color=edge_color,
                            arrows=arrows, ax=axis)
-    nx.draw_networkx_labels(graph, graph_pos,font_size=node_text_size,
+    nx.draw_networkx_labels(graph, graph_pos, font_size=node_text_size,
                             font_family=text_font, ax=axis)
 
     plt.savefig(filename)
