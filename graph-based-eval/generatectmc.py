@@ -22,7 +22,7 @@ def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='spring',
 
     state_labels = {}
     for state_graph in ctmc_graph.nodes():
-        state_labels[state_graph] = state_graph.nodes()
+        state_labels[state_graph] = sorted(state_graph.nodes())
 
     nx.draw_networkx_nodes(ctmc_graph, graph_pos, node_size=node_size,
                            alpha=node_alpha, node_color=node_color, ax=axis)
