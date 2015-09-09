@@ -50,6 +50,12 @@ def is_faulty(G, num_necessary_slaves):
         num_slaves_cc2 >= num_necessary_slaves)
 
 
+def extract_node(G, v):
+    for n in G.neighbors(v):
+        G.remove_node(n)
+    G.remove_node(v)
+
+
 slaves = ['s1', 's2']
 switches = ['b1', 'b2']
 
