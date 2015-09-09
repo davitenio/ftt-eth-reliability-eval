@@ -2,10 +2,10 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='spring',
+def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='shell',
                node_size=1600, node_color='gray', node_alpha=0.3,
-               node_text_size=12,
-               edge_color='blue', edge_alpha=0.3, edge_tickness=1,
+               node_text_size=10,
+               edge_color='gray', edge_alpha=0.3, edge_tickness=1,
                edge_text_pos=0.3,
                text_font='sans-serif'):
 
@@ -29,9 +29,9 @@ def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='spring',
     nx.draw_networkx_edges(ctmc_graph, graph_pos, width=edge_tickness,
                            alpha=edge_alpha, edge_color=edge_color,
                            arrows=True, ax=axis)
-    nx.draw_networkx_labels(ctmc_graph, graph_pos, font_size=node_text_size,
-                            font_family=text_font, ax=axis)
-    nx.draw_networkx_labels(ctmc_graph, graph_pos, state_labels)
+    nx.draw_networkx_labels(ctmc_graph, graph_pos, state_labels,
+                            font_size=node_text_size, font_family=text_font,
+                            ax=axis)
 
     plt.axis('off')
 
