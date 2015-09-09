@@ -6,7 +6,7 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
                node_size=1600, node_color='blue', node_alpha=0.3,
                node_text_size=12,
                edge_color='blue', edge_alpha=0.3, edge_tickness=1,
-               edge_text_pos=0.3,
+               edge_text_pos=0.3, arrows=False,
                text_font='sans-serif'):
 
     figure, axis = plt.subplots()
@@ -23,7 +23,8 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     nx.draw_networkx_nodes(graph,graph_pos,node_size=node_size,
                            alpha=node_alpha, node_color=node_color, ax=axis)
     nx.draw_networkx_edges(graph,graph_pos,width=edge_tickness,
-                           alpha=edge_alpha,edge_color=edge_color, ax=axis)
+                           alpha=edge_alpha,edge_color=edge_color,
+                           arrows=arrows, ax=axis)
     nx.draw_networkx_labels(graph, graph_pos,font_size=node_text_size,
                             font_family=text_font, ax=axis)
 
