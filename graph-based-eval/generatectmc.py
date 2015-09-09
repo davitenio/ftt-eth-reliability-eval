@@ -20,18 +20,26 @@ def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='shell',
     else:
         graph_pos=nx.spring_layout(ctmc_graph)
 
-    state_labels = {}
-    for state_graph in ctmc_graph.nodes():
-        state_labels[state_graph] = sorted(state_graph.nodes())
-
     nx.draw_networkx_nodes(ctmc_graph, graph_pos, node_size=node_size,
                            alpha=node_alpha, node_color=node_color, ax=axis)
     nx.draw_networkx_edges(ctmc_graph, graph_pos, width=edge_tickness,
                            alpha=edge_alpha, edge_color=edge_color,
                            arrows=True, ax=axis)
+
+    state_labels = {}
+    for state_graph in ctmc_graph.nodes_iter():
+        state_labels[state_graph] = sorted(state_graph.nodes_iter())
     nx.draw_networkx_labels(ctmc_graph, graph_pos, state_labels,
                             font_size=node_text_size, font_family=text_font,
                             ax=axis)
+
+    edge_labels = {}
+    for e in ctmc_graph.edges_iter():
+        edge_labels[e] = mc.edge[e[0]][e[1]]['failed_element']
+    nx.draw_networkx_edge_labels(ctmc_graph, graph_pos, edge_labels,
+                            font_size=node_text_size, font_family=text_font,
+                            ax=axis)
+
 
     plt.axis('off')
 
@@ -74,12 +82,12 @@ def is_faulty(G, num_necessary_slaves):
     each other in graph G for G not to be faulty.
     """
     num_slaves_cc1 = num_slaves_cc2 = 0
-    if 'b1' in G.nodes():
+    if 'b1' in G.nodes_iter():
         cc1 = nx.node_connected_component(G, 'b1')
         for v in cc1:
             if v in slaves:
                 num_slaves_cc1 = num_slaves_cc1 + 1
-    if 'b2' in G.nodes():
+    if 'b2' in G.nodes_iter():
         cc2 = nx.node_connected_component(G, 'b2')
         for v in cc2:
             if v in slaves:
@@ -95,16 +103,15 @@ def extract_node(G, v):
     G.remove_node(v)
 
 
-def add_rate(mc, src_state, dst_state, rate):
-    new_label = rate
+def add_rate(mc, src_state, dst_state, failed_element):
     if mc.has_edge(src_state, dst_state):
         print "MC already has edge {}".format((src_state, dst_state))
-        mc.edge[src_state][dst_state]['fail_rate'] = 42
-    mc.add_edge(src_state, dst_state, fail_rate=23)
+        mc.edge[src_state][dst_state]['failed_element'].append(failed_element)
+    mc.add_edge(src_state, dst_state, failed_element=[failed_element])
 
 
 def explore(G, F, mc, extractable_vertices, is_faulty, *args):
-    for v in G.nodes():
+    for v in G.nodes_iter():
         H = G.copy()
         if v in extractable_vertices:
             extract_node(H, v)
@@ -114,12 +121,12 @@ def explore(G, F, mc, extractable_vertices, is_faulty, *args):
             print "Deleted vertex {}".format(v)
 
         if is_faulty(H, *args):
-            add_rate(mc, G, F, str(v))
-        elif H in mc.nodes():
-            add_rate(mc, G, H, str(v))
+            add_rate(mc, G, F, v)
+        elif H in mc.nodes_iter():
+            add_rate(mc, G, H, v)
         else:
             mc.add_node(H)
-            add_rate(mc, G, H, str(v))
+            add_rate(mc, G, H, v)
             explore(H, F, mc, extractable_vertices, is_faulty, *args)
 
 
