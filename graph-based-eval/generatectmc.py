@@ -28,6 +28,8 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     nx.draw_networkx_labels(graph, graph_pos, font_size=node_text_size,
                             font_family=text_font, ax=axis)
 
+    plt.axis('off')
+
     plt.savefig(filename)
 
 def is_faulty(G, num_necessary_slaves):
