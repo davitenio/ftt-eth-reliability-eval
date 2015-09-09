@@ -95,6 +95,45 @@ def extract_node(G, v):
     G.remove_node(v)
 
 
+def add_rate(mc, src_state, dst_state, rate):
+    new_label = rate
+    if mc.has_edge(src_state, dst_state):
+        print "MC already has edge {}".format((src_state, dst_state))
+        mc.edge[src_state][dst_state]['fail_rate'] = 42
+    mc.add_edge(src_state, dst_state, fail_rate=23)
+
+
+def explore(G, F, mc, extractable_vertices, is_faulty, *args):
+    for v in G.nodes():
+        H = G.copy()
+        if v in extractable_vertices:
+            extract_node(H, v)
+            print "Extracted vertex {}".format(v)
+        else:
+            H.remove_node(v)
+            print "Deleted vertex {}".format(v)
+
+        if is_faulty(H, *args):
+            add_rate(mc, G, F, str(v))
+        elif H in mc.nodes():
+            add_rate(mc, G, H, str(v))
+        else:
+            mc.add_node(H)
+            add_rate(mc, G, H, str(v))
+            explore(H, F, mc, extractable_vertices, is_faulty, *args)
+
+
+def generate_mc(G, extractable_vertices, is_faulty, *args):
+    if is_faulty(G, *args):
+        return None
+    mc = nx.DiGraph()
+    # empty graph (corresponding to the failure state)
+    F = nx.Graph()
+    mc.add_nodes_from([G, F])
+    explore(G, F, mc, extractable_vertices, is_faulty, *args)
+    return mc
+
+
 slaves = ['s1', 's2']
 switches = ['b1', 'b2']
 
@@ -104,6 +143,9 @@ E = [('s1', 'l1'), ('s1', 'l2'), ('l1', 'b1'), ('l2', 'b2'),
 G = nx.Graph()
 G.add_edges_from(E)
 
+G.remove_nodes_from(['b2', 'l5', 'l6', 'l2', 'l4'])
+
 save_graph_drawing(G, 'G.png')
 
-print is_faulty(G, 2)
+mc = generate_mc(G, [], is_faulty, 1)
+save_ctmc_drawing(mc, 'mc.png')
