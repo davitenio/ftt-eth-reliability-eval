@@ -29,6 +29,26 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     # show graph
     plt.savefig(filename)
 
+def is_faulty(G, num_necessary_slaves):
+    """
+    num_necessary_slaves: minimum number of slaves that must be connected to
+    each other in graph G for G not to be faulty.
+    """
+    num_slaves_cc1 = num_slaves_cc2 = 0
+    if 'b1' in G.nodes():
+        cc1 = nx.node_connected_component(G, 'b1')
+        for v in cc1:
+            if v in slaves:
+                num_slaves_cc1 = num_slaves_cc1 + 1
+    if 'b2' in G.nodes():
+        cc2 = nx.node_connected_component(G, 'b2')
+        for v in cc2:
+            if v in slaves:
+                num_slaves_cc2 = num_slaves_cc2 + 1
+    return not (
+        num_slaves_cc1 >= num_necessary_slaves or
+        num_slaves_cc2 >= num_necessary_slaves)
+
 
 slaves = ['s1', 's2']
 switches = ['b1', 'b2']
@@ -40,3 +60,5 @@ G = nx.Graph()
 G.add_edges_from(E)
 
 save_graph_drawing(G, 'G.png')
+
+print is_faulty(G, 2)
