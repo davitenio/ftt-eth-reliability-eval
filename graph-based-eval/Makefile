@@ -1,2 +1,2 @@
-all: generate-mc.sage
-	sagemath generate-mc.sage
+all: generatectmc.py
+	python generatectmc.py
