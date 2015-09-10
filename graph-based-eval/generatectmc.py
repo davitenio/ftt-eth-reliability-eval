@@ -109,7 +109,8 @@ def add_rate(mc, src_state, dst_state, failed_element):
     if mc.has_edge(src_state, dst_state):
         print "MC already has edge {}".format((src_state, dst_state))
         mc.edge[src_state][dst_state]['failed_element'].append(failed_element)
-    mc.add_edge(src_state, dst_state, failed_element=[failed_element])
+    else:
+        mc.add_edge(src_state, dst_state, failed_element=[failed_element])
 
 
 def explore(G, F, mc, extractable_vertices, is_faulty, *args):
