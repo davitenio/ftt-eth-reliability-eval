@@ -107,14 +107,22 @@ def extract_node(G, v):
 
 def add_rate(mc, src_state, dst_state, failed_element):
     if mc.has_edge(src_state, dst_state):
-        print "MC already has edge {}".format((src_state, dst_state))
+        print "MC already has edge {}".format((src_state.nodes(), dst_state.nodes()))
         mc.edge[src_state][dst_state]['failed_element'].append(failed_element)
     else:
         mc.add_edge(src_state, dst_state, failed_element=[failed_element])
+    print "Rate is {}".format(mc.edge[src_state][dst_state]['failed_element'])
+
+
+def colors_match(n1_attrib, n2_attrib):
+    return n1_attrib['color']==n2_attrib['color']
 
 
 def explore(G, F, mc, extractable_vertices, is_faulty, *args):
+    print "New recursion"
+    print G.nodes()
     for v in G.nodes_iter():
+        print "Vertex: {}".format(v)
         H = G.copy()
         if v in extractable_vertices:
             extract_node(H, v)
@@ -122,15 +130,31 @@ def explore(G, F, mc, extractable_vertices, is_faulty, *args):
         else:
             H.remove_node(v)
             print "Deleted vertex {}".format(v)
+        cc_subgraphs = nx.connected_component_subgraphs(H)
+        for cc in cc_subgraphs:
+            if is_faulty(cc, *args):
+                for cc_vertex in cc.nodes_iter():
+                    H.remove_node(cc_vertex)
 
         if is_faulty(H, *args):
+            print "Adding transition from {} to faulty state".format(G.nodes())
             add_rate(mc, G, F, v)
-        elif H in mc.nodes_iter():
-            add_rate(mc, G, H, v)
+            continue
+
+        for state in mc.nodes_iter():
+            if nx.is_isomorphic(state, H, node_match=colors_match):
+                print "MC already has state isomorphic to {}".format(H.nodes())
+                print "Adding transition from {} to {}".format(G.nodes(), state.nodes())
+                add_rate(mc, G, state, v)
+                break
         else:
+            print "Adding new state {}".format(H.nodes())
             mc.add_node(H)
+            print "Adding transition from {} to {}".format(G.nodes(), H.nodes())
             add_rate(mc, G, H, v)
             explore(H, F, mc, extractable_vertices, is_faulty, *args)
+            print "Backtracking"
+            print G.nodes()
 
 
 def generate_mc(G, extractable_vertices, is_faulty, *args):
@@ -173,5 +197,7 @@ G.remove_nodes_from(['b2', 'l5', 'l6', 'l2', 'l4'])
 
 save_graph_drawing(G, 'G.png')
 
-mc = generate_mc(G, [], is_faulty, 1)
+mc = generate_mc(G, slaves+switches, is_faulty, 1)
 save_ctmc_drawing(mc, 'mc.png')
+
+for i in range(5): print
