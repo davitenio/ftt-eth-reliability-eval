@@ -107,7 +107,8 @@ def extract_node(G, v):
 
 def add_rate(mc, src_state, dst_state, failed_element):
     if mc.has_edge(src_state, dst_state):
-        print "MC already has edge {}".format((src_state.nodes(), dst_state.nodes()))
+        print "MC already has edge {}".format(
+            (sorted(src_state.nodes()), sorted(dst_state.nodes())))
         mc.edge[src_state][dst_state]['failed_element'].append(failed_element)
     else:
         mc.add_edge(src_state, dst_state, failed_element=[failed_element])
@@ -120,7 +121,7 @@ def colors_match(n1_attrib, n2_attrib):
 
 def explore(G, F, mc, extractable_vertices, is_faulty, *args):
     print "New recursion"
-    print G.nodes()
+    print sorted(G.nodes())
     for v in G.nodes_iter():
         print "Vertex: {}".format(v)
         H = G.copy()
@@ -137,24 +138,28 @@ def explore(G, F, mc, extractable_vertices, is_faulty, *args):
                     H.remove_node(cc_vertex)
 
         if is_faulty(H, *args):
-            print "Adding transition from {} to faulty state".format(G.nodes())
+            print "Adding transition from {} to faulty state".format(
+                sorted(G.nodes()))
             add_rate(mc, G, F, v)
             continue
 
         for state in mc.nodes_iter():
             if nx.is_isomorphic(state, H, node_match=colors_match):
-                print "MC already has state isomorphic to {}".format(H.nodes())
-                print "Adding transition from {} to {}".format(G.nodes(), state.nodes())
+                print "MC already has state isomorphic to {}".format(
+                    sorted(H.nodes()))
+                print "Adding transition from {} to {}".format(
+                    sorted(G.nodes()), sorted(state.nodes()))
                 add_rate(mc, G, state, v)
                 break
         else:
-            print "Adding new state {}".format(H.nodes())
+            print "Adding new state {}".format(sorted(H.nodes()))
             mc.add_node(H)
-            print "Adding transition from {} to {}".format(G.nodes(), H.nodes())
+            print "Adding transition from {} to {}".format(
+                sorted(G.nodes()), sorted(H.nodes()))
             add_rate(mc, G, H, v)
             explore(H, F, mc, extractable_vertices, is_faulty, *args)
             print "Backtracking"
-            print G.nodes()
+            print sorted(G.nodes())
 
 
 def generate_mc(G, extractable_vertices, is_faulty, *args):
@@ -193,7 +198,7 @@ class_to_color = {
 
 colorize_graph(G, class_to_color)
 
-G.remove_nodes_from(['b2', 'l5', 'l6', 'l2', 'l4'])
+G.remove_nodes_from(['l6', 'l5'])
 
 save_graph_drawing(G, 'G.png')
 
