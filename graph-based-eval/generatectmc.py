@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='shell',
                node_size=1600, node_color='gray', node_alpha=0.3,
-               node_text_size=10,
+               node_text_size=8,
                edge_color='gray', edge_alpha=0.3, edge_tickness=1,
                edge_text_pos=0.3,
                text_font='sans-serif'):
@@ -43,7 +43,7 @@ def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='shell',
 
     plt.axis('off')
 
-    plt.savefig(filename)
+    plt.savefig(filename, bbox_inches="tight")
 
 
 def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
