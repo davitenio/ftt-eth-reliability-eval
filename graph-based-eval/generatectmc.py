@@ -47,7 +47,7 @@ def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='shell',
 
 
 def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
-               node_size=1600, node_color='blue', node_alpha=0.3,
+               node_size=1600, node_alpha=0.3,
                node_text_size=12,
                edge_color='blue', edge_alpha=0.3, edge_tickness=1,
                edge_text_pos=0.3, arrows=False,
@@ -64,8 +64,10 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     else:
         graph_pos=nx.spring_layout(graph)
 
+    colors = [graph.node[vertex]['color'] for vertex in graph.nodes()]
+
     nx.draw_networkx_nodes(graph, graph_pos, node_size=node_size,
-                           alpha=node_alpha, node_color=node_color, ax=axis)
+                           alpha=node_alpha, node_color=colors, ax=axis)
     nx.draw_networkx_edges(graph, graph_pos, width=edge_tickness,
                            alpha=edge_alpha, edge_color=edge_color,
                            arrows=arrows, ax=axis)
@@ -141,14 +143,30 @@ def generate_mc(G, extractable_vertices, is_faulty, *args):
     return mc
 
 
-slaves = ['s1', 's2']
-switches = ['b1', 'b2']
+def colorize_graph(G, class_to_color):
+    for vertex in G.nodes_iter():
+        for equivalence_class, class_color in class_to_color.items():
+            if vertex in equivalence_class:
+                G.node[vertex]['color'] = class_color
+
+
+slaves = ('s1', 's2')
+switches = ('b1', 'b2')
+links = ('l1', 'l2', 'l3', 'l4', 'l5', 'l6')
 
 E = [('s1', 'l1'), ('s1', 'l2'), ('l1', 'b1'), ('l2', 'b2'),
      ('b1', 'l5'), ('l5', 'b2'), ('b1', 'l6'), ('l6', 'b2'),
      ('s2', 'l3'), ('s2', 'l4'), ('l3', 'b1'), ('l4', 'b2')]
 G = nx.Graph()
 G.add_edges_from(E)
+
+class_to_color = {
+    slaves: 'green',
+    switches: 'yellow',
+    links: 'blue'
+}
+
+colorize_graph(G, class_to_color)
 
 G.remove_nodes_from(['b2', 'l5', 'l6', 'l2', 'l4'])
 
