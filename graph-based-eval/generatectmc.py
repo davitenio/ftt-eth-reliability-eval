@@ -99,12 +99,6 @@ def is_faulty(G, num_necessary_slaves):
         num_slaves_cc2 >= num_necessary_slaves)
 
 
-def extract_node(G, v):
-    for n in G.neighbors(v):
-        G.remove_node(n)
-    G.remove_node(v)
-
-
 def add_rate(mc, src_state, dst_state, failed_element):
     if mc.has_edge(src_state, dst_state):
         print "MC already has edge {}".format(
@@ -119,18 +113,15 @@ def colors_match(n1_attrib, n2_attrib):
     return n1_attrib['color']==n2_attrib['color']
 
 
-def explore(G, F, mc, extractable_vertices, is_faulty, *args):
+def explore(G, F, mc, is_faulty, *args):
     print "New recursion"
     print sorted(G.nodes())
     for v in G.nodes_iter():
         print "Vertex: {}".format(v)
         H = G.copy()
-        if v in extractable_vertices:
-            extract_node(H, v)
-            print "Extracted vertex {}".format(v)
-        else:
-            H.remove_node(v)
-            print "Deleted vertex {}".format(v)
+        H.remove_node(v)
+        print "Deleted vertex {}".format(v)
+
         cc_subgraphs = nx.connected_component_subgraphs(H)
         for cc in cc_subgraphs:
             if is_faulty(cc, *args):
@@ -157,19 +148,19 @@ def explore(G, F, mc, extractable_vertices, is_faulty, *args):
             print "Adding transition from {} to {}".format(
                 sorted(G.nodes()), sorted(H.nodes()))
             add_rate(mc, G, H, v)
-            explore(H, F, mc, extractable_vertices, is_faulty, *args)
+            explore(H, F, mc, is_faulty, *args)
             print "Backtracking"
             print sorted(G.nodes())
 
 
-def generate_mc(G, extractable_vertices, is_faulty, *args):
+def generate_mc(G, is_faulty, *args):
     if is_faulty(G, *args):
         return None
     mc = nx.DiGraph()
     # empty graph (corresponding to the failure state)
     F = nx.Graph()
     mc.add_nodes_from([G, F])
-    explore(G, F, mc, extractable_vertices, is_faulty, *args)
+    explore(G, F, mc, is_faulty, *args)
     return mc
 
 
@@ -202,7 +193,7 @@ G.remove_nodes_from(['l6', 'l5'])
 
 save_graph_drawing(G, 'G.png')
 
-mc = generate_mc(G, slaves+switches, is_faulty, 1)
+mc = generate_mc(G, is_faulty, 1)
 save_ctmc_drawing(mc, 'mc.png')
 
 for i in range(5): print
