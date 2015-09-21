@@ -60,4 +60,6 @@ save_graph_drawing(G, 'G.png')
 mc = generate_mc(G, is_faulty, switches, slaves, num_required_slaves)
 save_ctmc_drawing(mc, 'mc.png')
 
+print "Size of state space: {}".format(mc.order())
+
 for i in range(5): print
