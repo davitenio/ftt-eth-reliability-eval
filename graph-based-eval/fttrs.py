@@ -5,12 +5,14 @@ from itertools import cycle, combinations
 
 num_slaves = 2
 num_switches = 2
-num_links = num_switches * num_slaves
 # number of interlinks between each pair of switches
 interlink_redundancy = 2
+num_required_slaves = 1
+
+
+num_links = num_switches * num_slaves
 # A clique K_n has n choose 2 = n * (n-1)/2 edges
 num_interlinks = interlink_redundancy * num_switches * (num_switches - 1)/2
-num_required_slaves = 1
 
 
 slaves = tuple(['s' + str(i) for i in range(num_slaves)])
