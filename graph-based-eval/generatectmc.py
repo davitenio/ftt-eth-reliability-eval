@@ -35,7 +35,7 @@ def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='shell',
 
     edge_labels = {}
     for e in ctmc_graph.edges_iter():
-        edge_labels[e] = mc.edge[e[0]][e[1]]['failed_element']
+        edge_labels[e] = ctmc_graph.edge[e[0]][e[1]]['failed_element']
     nx.draw_networkx_edge_labels(ctmc_graph, graph_pos, edge_labels,
                             font_size=node_text_size, font_family=text_font,
                             ax=axis)
