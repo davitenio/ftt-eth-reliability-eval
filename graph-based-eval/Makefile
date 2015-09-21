@@ -1,2 +1,2 @@
-all: generatectmc.py
-	python generatectmc.py
+all: generatectmc.py fttrs.py
+	python fttrs.py

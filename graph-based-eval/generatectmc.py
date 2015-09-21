@@ -78,25 +78,21 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
 
     plt.savefig(filename)
 
-def is_faulty(G, num_necessary_slaves):
+def is_faulty(G, switches, slaves, num_necessary_slaves):
     """
     num_necessary_slaves: minimum number of slaves that must be connected to
     each other in graph G for G not to be faulty.
     """
-    num_slaves_cc1 = num_slaves_cc2 = 0
-    if 'b1' in G.nodes_iter():
-        cc1 = nx.node_connected_component(G, 'b1')
-        for v in cc1:
-            if v in slaves:
-                num_slaves_cc1 = num_slaves_cc1 + 1
-    if 'b2' in G.nodes_iter():
-        cc2 = nx.node_connected_component(G, 'b2')
-        for v in cc2:
-            if v in slaves:
-                num_slaves_cc2 = num_slaves_cc2 + 1
-    return not (
-        num_slaves_cc1 >= num_necessary_slaves or
-        num_slaves_cc2 >= num_necessary_slaves)
+    num_slaves_cc = {}
+    for switch in switches:
+        num_slaves_cc[switch] = 0
+        if switch in G.nodes_iter():
+            cc = nx.node_connected_component(G, switch)
+            for vertex in cc:
+                if vertex in slaves:
+                    num_slaves_cc[switch] = num_slaves_cc[switch] + 1
+    return all([num_slaves_cc[switch] < num_necessary_slaves
+                for switch in switches])
 
 
 def add_rate(mc, src_state, dst_state, failed_element):
@@ -169,31 +165,3 @@ def colorize_graph(G, class_to_color):
         for equivalence_class, class_color in class_to_color.items():
             if vertex in equivalence_class:
                 G.node[vertex]['color'] = class_color
-
-
-slaves = ('s1', 's2')
-switches = ('b1', 'b2')
-links = ('l1', 'l2', 'l3', 'l4', 'l5', 'l6')
-
-E = [('s1', 'l1'), ('s1', 'l2'), ('l1', 'b1'), ('l2', 'b2'),
-     ('b1', 'l5'), ('l5', 'b2'), ('b1', 'l6'), ('l6', 'b2'),
-     ('s2', 'l3'), ('s2', 'l4'), ('l3', 'b1'), ('l4', 'b2')]
-G = nx.Graph()
-G.add_edges_from(E)
-
-class_to_color = {
-    slaves: 'green',
-    switches: 'yellow',
-    links: 'blue'
-}
-
-colorize_graph(G, class_to_color)
-
-G.remove_nodes_from(['l6', 'l5'])
-
-save_graph_drawing(G, 'G.png')
-
-mc = generate_mc(G, is_faulty, 1)
-save_ctmc_drawing(mc, 'mc.png')
-
-for i in range(5): print
