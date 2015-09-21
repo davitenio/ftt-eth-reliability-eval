@@ -1,9 +1,26 @@
 import networkx as nx
 from generatectmc import colorize_graph, generate_mc
 from generatectmc import save_graph_drawing, save_ctmc_drawing
-from generatectmc import is_faulty
 
 from itertools import cycle, combinations
+
+
+def is_faulty(G, switches, slaves, num_necessary_slaves):
+    """
+    num_necessary_slaves: minimum number of slaves that must be connected to
+    each other in graph G for G not to be faulty.
+    """
+    num_slaves_cc = {}
+    for switch in switches:
+        num_slaves_cc[switch] = 0
+        if switch in G.nodes_iter():
+            cc = nx.node_connected_component(G, switch)
+            for vertex in cc:
+                if vertex in slaves:
+                    num_slaves_cc[switch] = num_slaves_cc[switch] + 1
+    return all([num_slaves_cc[switch] < num_necessary_slaves
+                for switch in switches])
+
 
 num_slaves = 2
 num_switches = 2

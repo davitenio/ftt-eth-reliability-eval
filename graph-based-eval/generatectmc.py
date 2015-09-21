@@ -78,22 +78,6 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
 
     plt.savefig(filename)
 
-def is_faulty(G, switches, slaves, num_necessary_slaves):
-    """
-    num_necessary_slaves: minimum number of slaves that must be connected to
-    each other in graph G for G not to be faulty.
-    """
-    num_slaves_cc = {}
-    for switch in switches:
-        num_slaves_cc[switch] = 0
-        if switch in G.nodes_iter():
-            cc = nx.node_connected_component(G, switch)
-            for vertex in cc:
-                if vertex in slaves:
-                    num_slaves_cc[switch] = num_slaves_cc[switch] + 1
-    return all([num_slaves_cc[switch] < num_necessary_slaves
-                for switch in switches])
-
 
 def add_rate(mc, src_state, dst_state, failed_element):
     if mc.has_edge(src_state, dst_state):
