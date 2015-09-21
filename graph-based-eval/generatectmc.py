@@ -97,12 +97,9 @@ def is_faulty(G, switches, slaves, num_necessary_slaves):
 
 def add_rate(mc, src_state, dst_state, failed_element):
     if mc.has_edge(src_state, dst_state):
-        print "MC already has edge {}".format(
-            (sorted(src_state.nodes()), sorted(dst_state.nodes())))
         mc.edge[src_state][dst_state]['failed_element'].append(failed_element)
     else:
         mc.add_edge(src_state, dst_state, failed_element=[failed_element])
-    print "Rate is {}".format(mc.edge[src_state][dst_state]['failed_element'])
 
 
 def colors_match(n1_attrib, n2_attrib):
@@ -110,13 +107,9 @@ def colors_match(n1_attrib, n2_attrib):
 
 
 def explore(G, F, mc, is_faulty, *args):
-    print "New recursion"
-    print sorted(G.nodes())
     for v in G.nodes_iter():
-        print "Vertex: {}".format(v)
         H = G.copy()
         H.remove_node(v)
-        print "Deleted vertex {}".format(v)
 
         cc_subgraphs = nx.connected_component_subgraphs(H)
         for cc in cc_subgraphs:
@@ -125,28 +118,17 @@ def explore(G, F, mc, is_faulty, *args):
                     H.remove_node(cc_vertex)
 
         if is_faulty(H, *args):
-            print "Adding transition from {} to faulty state".format(
-                sorted(G.nodes()))
             add_rate(mc, G, F, v)
             continue
 
         for state in mc.nodes_iter():
             if nx.is_isomorphic(state, H, node_match=colors_match):
-                print "MC already has state isomorphic to {}".format(
-                    sorted(H.nodes()))
-                print "Adding transition from {} to {}".format(
-                    sorted(G.nodes()), sorted(state.nodes()))
                 add_rate(mc, G, state, v)
                 break
         else:
-            print "Adding new state {}".format(sorted(H.nodes()))
             mc.add_node(H)
-            print "Adding transition from {} to {}".format(
-                sorted(G.nodes()), sorted(H.nodes()))
             add_rate(mc, G, H, v)
             explore(H, F, mc, is_faulty, *args)
-            print "Backtracking"
-            print sorted(G.nodes())
 
 
 def generate_mc(G, is_faulty, *args):

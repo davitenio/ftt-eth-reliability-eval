@@ -38,7 +38,6 @@ for slave in slaves:
 # Create clique of switches interconnected by interlinks
 i = 0
 for switch1, switch2 in combinations(switches, 2):
-    print switch1, switch2
     for j in range(interlink_redundancy):
         E.append((switch1, interlinks[i+j]))
         E.append((switch2, interlinks[i+j]))
