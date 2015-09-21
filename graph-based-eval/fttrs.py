@@ -1,5 +1,7 @@
 import networkx as nx
-from generatectmc import *
+from generatectmc import colorize_graph, generate_mc
+from generatectmc import save_graph_drawing, save_ctmc_drawing
+from generatectmc import is_faulty
 
 from itertools import cycle, combinations
 
