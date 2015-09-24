@@ -1,5 +1,5 @@
 import networkx as nx
-from generatectmc import colorize_graph, generate_mc
+from generatectmc import colorize_graph, generate_ctmc
 from generatectmc import save_graph_drawing, save_ctmc_drawing
 
 from itertools import cycle, combinations
@@ -76,9 +76,9 @@ colorize_graph(G, class_to_color)
 
 save_graph_drawing(G, 'G.png')
 
-mc = generate_mc(G, is_faulty, switches, slaves, num_required_slaves)
-save_ctmc_drawing(mc, 'mc.png')
+ctmc = generate_ctmc(G, is_faulty, switches, slaves, num_required_slaves)
+save_ctmc_drawing(ctmc, 'ctmc.png')
 
-print "Size of state space: {}".format(mc.order())
+print "Size of state space: {}".format(ctmc.order())
 
 for i in range(5): print

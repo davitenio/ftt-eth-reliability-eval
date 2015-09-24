@@ -79,18 +79,18 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     plt.savefig(filename)
 
 
-def add_rate(mc, src_state, dst_state, failed_element):
-    if mc.has_edge(src_state, dst_state):
-        mc.edge[src_state][dst_state]['failed_element'].append(failed_element)
+def add_rate(ctmc, src_state, dst_state, failed_element):
+    if ctmc.has_edge(src_state, dst_state):
+        ctmc.edge[src_state][dst_state]['failed_element'].append(failed_element)
     else:
-        mc.add_edge(src_state, dst_state, failed_element=[failed_element])
+        ctmc.add_edge(src_state, dst_state, failed_element=[failed_element])
 
 
 def colors_match(n1_attrib, n2_attrib):
     return n1_attrib['color']==n2_attrib['color']
 
 
-def explore(G, F, mc, is_faulty, *args):
+def explore(G, F, ctmc, is_faulty, *args):
     for v in G.nodes_iter():
         H = G.copy()
         H.remove_node(v)
@@ -102,28 +102,28 @@ def explore(G, F, mc, is_faulty, *args):
                     H.remove_node(cc_vertex)
 
         if is_faulty(H, *args):
-            add_rate(mc, G, F, v)
+            add_rate(ctmc, G, F, v)
             continue
 
-        for state in mc.nodes_iter():
+        for state in ctmc.nodes_iter():
             if nx.is_isomorphic(state, H, node_match=colors_match):
-                add_rate(mc, G, state, v)
+                add_rate(ctmc, G, state, v)
                 break
         else:
-            mc.add_node(H)
-            add_rate(mc, G, H, v)
-            explore(H, F, mc, is_faulty, *args)
+            ctmc.add_node(H)
+            add_rate(ctmc, G, H, v)
+            explore(H, F, ctmc, is_faulty, *args)
 
 
-def generate_mc(G, is_faulty, *args):
+def generate_ctmc(G, is_faulty, *args):
     if is_faulty(G, *args):
         return None
-    mc = nx.DiGraph()
+    ctmc = nx.DiGraph()
     # empty graph (corresponding to the failure state)
     F = nx.Graph()
-    mc.add_nodes_from([G, F])
-    explore(G, F, mc, is_faulty, *args)
-    return mc
+    ctmc.add_nodes_from([G, F])
+    explore(G, F, ctmc, is_faulty, *args)
+    return ctmc
 
 
 def colorize_graph(G, class_to_color):
