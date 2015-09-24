@@ -35,7 +35,7 @@ def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='shell',
 
     edge_labels = {}
     for e in ctmc_graph.edges_iter():
-        edge_labels[e] = ctmc_graph.edge[e[0]][e[1]]['failed_element']
+        edge_labels[e] = ctmc_graph.edge[e[0]][e[1]]['failed_region']
     nx.draw_networkx_edge_labels(ctmc_graph, graph_pos, edge_labels,
                             font_size=node_text_size, font_family=text_font,
                             ax=axis)
@@ -79,11 +79,11 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     plt.savefig(filename)
 
 
-def add_rate(ctmc, src_state, dst_state, failed_element):
+def add_rate(ctmc, src_state, dst_state, failed_region):
     if ctmc.has_edge(src_state, dst_state):
-        ctmc.edge[src_state][dst_state]['failed_element'].append(failed_element)
+        ctmc.edge[src_state][dst_state]['failed_region'].append(failed_region)
     else:
-        ctmc.add_edge(src_state, dst_state, failed_element=[failed_element])
+        ctmc.add_edge(src_state, dst_state, failed_region=[failed_region])
 
 
 def colors_match(n1_attrib, n2_attrib):
