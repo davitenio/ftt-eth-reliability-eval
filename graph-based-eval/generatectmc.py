@@ -97,11 +97,11 @@ def colors_match(n1_attrib, n2_attrib):
 
 def explore(G, F, ctmc, is_faulty, *args):
     for v in G.nodes_iter():
-        H = G.copy()
+        H = nx.Graph(G)
         H.remove_node(v)
 
-        cc_subgraphs = nx.connected_component_subgraphs(H)
-        for cc in cc_subgraphs:
+        cc_subgraphs = nx.connected_component_subgraphs(H, copy=False)
+        for cc in list(cc_subgraphs):
             if is_faulty(cc, *args):
                 for cc_vertex in cc.nodes_iter():
                     H.remove_node(cc_vertex)
