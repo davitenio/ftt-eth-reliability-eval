@@ -2,7 +2,7 @@ import networkx as nx
 from generatectmc import colorize_graph, generate_ctmc
 from generatectmc import save_graph_drawing, save_ctmc_drawing
 
-from itertools import cycle, combinations
+from itertools import combinations
 
 
 def is_faulty(G, switches, slaves, num_necessary_slaves):
@@ -23,53 +23,100 @@ def is_faulty(G, switches, slaves, num_necessary_slaves):
 
 
 num_slaves = 2
-num_switches = 2
+num_switches = 1
 # number of interlinks between each pair of switches
 interlink_redundancy = 2
 num_required_slaves = 1
 
 
-num_links = num_switches * num_slaves
-# A clique K_n has n choose 2 = n * (n-1)/2 edges
-num_interlinks = interlink_redundancy * num_switches * (num_switches - 1)/2
+class Slave:
+    num_slaves = 0
+
+    def __init__(self):
+        Slave.num_slaves += 1
+        self.index = Slave.num_slaves
+
+    def __repr__(self):
+        return 's' + str(self.index)
 
 
-slaves = tuple(['s' + str(i) for i in range(num_slaves)])
-links = tuple(['l' + str(i) for i in range(num_links)])
-switches = tuple(['b' + str(i) for i in range(num_switches)])
-interlinks = tuple(['i' + str(i) for i in range(num_interlinks)])
+class Port:
+    num_ports = 0
 
-def cycle_zip(list1, list2):
-    if len(list1) > len(list2):
-        return zip(list1, cycle(list2))
-    elif len(list1) < len(list2):
-        return zip(cycle(list1), list2)
-    else:
-        return zip(list1, list2)
+    def __init__(self):
+        Port.num_ports += 1
+        self.index = Port.num_ports
+
+    def __repr__(self):
+        return 'p' + str(self.index)
 
 
-E = cycle_zip(links, slaves)
+class Link:
+    num_links = 0
+
+    def __init__(self):
+        Link.num_links += 1
+        self.index = Link.num_links
+
+    def __repr__(self):
+        return 'l' + str(self.index)
+
+
+class Switch:
+    num_switchs = 0
+
+    def __init__(self):
+        Switch.num_switchs += 1
+        self.index = Switch.num_switchs
+
+    def __repr__(self):
+        return 'b' + str(self.index)
+
+
+E = []
+slaves = [Slave() for i in range(num_slaves)]
+ports = []
+links = []
+switches = [Switch() for i in range(num_switches)]
 
 for slave in slaves:
-    links_of_slave = [a for (a, b) in E if b == slave]
-    E.extend(cycle_zip(links_of_slave, switches))
+    for switch in switches:
+        new_slave_port = Port()
+        ports.append(new_slave_port)
+        E.append((slave, new_slave_port))
+        new_slavelink = Link()
+        links.append(new_slavelink)
+        E.append((new_slave_port, new_slavelink))
+        new_switch_port = Port()
+        ports.append(new_switch_port)
+        E.append((new_slavelink, new_switch_port))
+        E.append((new_switch_port, switch))
 
 # Create clique of switches interconnected by interlinks
 i = 0
 for switch1, switch2 in combinations(switches, 2):
     for j in range(interlink_redundancy):
-        E.append((switch1, interlinks[i+j]))
-        E.append((switch2, interlinks[i+j]))
+        new_interlink_port = Port()
+        ports.append(new_interlink_port)
+        E.append((switch1, new_interlink_port))
+        new_interlink = Link()
+        links.append(new_interlink)
+        E.append((new_interlink_port, new_interlink))
+        new_interlink_port2 = Port()
+        ports.append(new_interlink_port2)
+        E.append((new_interlink, new_interlink_port2))
+        E.append((new_interlink_port2, switch2))
     i += interlink_redundancy
 
 G = nx.Graph()
 G.add_edges_from(E)
 
+
 class_to_color = {
-    slaves: 'green',
-    switches: 'yellow',
-    links: 'blue',
-    interlinks: 'blue'
+    tuple(slaves): 'green',
+    tuple(switches): 'yellow',
+    tuple(links): 'blue',
+    tuple(ports): 'red',
 }
 
 colorize_graph(G, class_to_color)
