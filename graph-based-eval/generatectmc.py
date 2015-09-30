@@ -64,7 +64,12 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     else:
         graph_pos=nx.spring_layout(graph)
 
-    colors = [graph.node[vertex]['color'] for vertex in graph.nodes()]
+    colors = []
+    for vertex in graph.nodes():
+        try:
+            colors.append(graph.node[vertex]['color'])
+        except KeyError:
+            colors.append('white')
 
     nx.draw_networkx_nodes(graph, graph_pos, node_size=node_size,
                            alpha=node_alpha, node_color=colors, ax=axis)
