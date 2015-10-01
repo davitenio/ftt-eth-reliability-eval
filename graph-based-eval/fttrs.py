@@ -63,11 +63,11 @@ class Link:
 
 
 class Switch:
-    num_switchs = 0
+    num_switches = 0
 
     def __init__(self):
-        Switch.num_switchs += 1
-        self.index = Switch.num_switchs
+        Switch.num_switches += 1
+        self.index = Switch.num_switches
 
     def __repr__(self):
         return 'b' + str(self.index)
