@@ -62,6 +62,17 @@ class Link:
         return 'l' + str(self.index)
 
 
+class Guardian:
+    num_guardians = 0
+
+    def __init__(self):
+        Guardian.num_guardians += 1
+        self.index = Guardian.num_guardians
+
+    def __repr__(self):
+        return 'g' + str(self.index)
+
+
 class Switch:
     num_switches = 0
 
@@ -77,6 +88,7 @@ E = []
 slaves = [Slave() for i in range(num_slaves)]
 ports = []
 links = []
+guardians = []
 switches = [Switch() for i in range(num_switches)]
 
 for slave in slaves:
@@ -87,10 +99,10 @@ for slave in slaves:
         new_slavelink = Link()
         links.append(new_slavelink)
         E.append((new_slave_port, new_slavelink))
-        new_switch_port = Port()
-        ports.append(new_switch_port)
-        E.append((new_slavelink, new_switch_port))
-        E.append((new_switch_port, switch))
+        new_guardian = Guardian()
+        guardians.append(new_guardian)
+        E.append((new_slavelink, new_guardian))
+        E.append((new_guardian, switch))
 
 # Create clique of switches interconnected by interlinks
 i = 0
@@ -117,6 +129,7 @@ class_to_color = {
     tuple(switches): 'yellow',
     tuple(links): 'blue',
     tuple(ports): 'red',
+    tuple(guardians): 'cyan',
 }
 
 colorize_graph(G, class_to_color)
