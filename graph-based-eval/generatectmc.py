@@ -49,8 +49,8 @@ def save_ctmc_drawing(ctmc_graph, filename, labels=None, graph_layout='shell',
 def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
                node_size=1600, node_alpha=0.3,
                node_text_size=12,
-               edge_color='blue', edge_alpha=0.3, edge_tickness=1,
-               edge_text_pos=0.3, arrows=False,
+               edge_alpha=0.3, edge_tickness=1,
+               edge_text_pos=0.3,
                text_font='sans-serif'):
 
     figure, axis = plt.subplots()
@@ -73,9 +73,17 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
 
     nx.draw_networkx_nodes(graph, graph_pos, node_size=node_size,
                            alpha=node_alpha, node_color=colors, ax=axis)
+
+    edge_colors = []
+    for u, v in graph.edges():
+        if graph.edge[u][v]['coverage'] == 0:
+            edge_colors.append('red')
+        else:
+            edge_colors.append('blue')
+
     nx.draw_networkx_edges(graph, graph_pos, width=edge_tickness,
-                           alpha=edge_alpha, edge_color=edge_color,
-                           arrows=arrows, ax=axis)
+                           alpha=edge_alpha, edge_color=edge_colors,
+                           arrows=True, ax=axis)
     nx.draw_networkx_labels(graph, graph_pos, font_size=node_text_size,
                             font_family=text_font, ax=axis)
 
@@ -95,12 +103,23 @@ def colors_match(n1_attrib, n2_attrib):
     return n1_attrib['color']==n2_attrib['color']
 
 
+def get_uncovered_neighborhood(G, v, source):
+    uncovered_neighborhood = [v]
+    for n in G.neighbors_iter(v):
+        if n == source:
+            continue
+        if G.edge[v][n]['coverage'] == 0:
+            uncovered_neighborhood.extend(get_uncovered_neighborhood(G, n, v))
+    return uncovered_neighborhood
+
 def explore(G, F, ctmc, is_faulty, *args):
     for v in G.nodes_iter():
-        H = nx.Graph(G)
-        H.remove_node(v)
+        H = nx.DiGraph(G)
+        vertices_to_delete = get_uncovered_neighborhood(G, v, None)
+        H.remove_nodes_from(vertices_to_delete)
 
-        cc_subgraphs = nx.connected_component_subgraphs(H, copy=False)
+        cc_subgraphs = nx.connected_component_subgraphs(
+            nx.Graph(H), copy=False)
         for cc in list(cc_subgraphs):
             if is_faulty(cc, *args):
                 for cc_vertex in cc.nodes_iter():
@@ -111,7 +130,8 @@ def explore(G, F, ctmc, is_faulty, *args):
             continue
 
         for state in ctmc.nodes_iter():
-            if nx.is_isomorphic(state, H, node_match=colors_match):
+            if nx.is_isomorphic(
+                    nx.Graph(state), nx.Graph(H), node_match=colors_match):
                 add_rate(ctmc, G, state, v)
                 break
         else:
