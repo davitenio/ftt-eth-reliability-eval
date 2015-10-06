@@ -158,11 +158,6 @@ G.add_edges_from(switch_to_guardian_edges, coverage=0)
 G.add_edges_from(switch_to_port_edges, coverage=0)
 G.add_edges_from(port_to_switch_edges, coverage=0.5)
 
-for v, n in G.edges():
-    print "edge {}-{} coverage: {}".format(v, n, G.edge[v][n]['coverage'])
-
-print "\n"
-
 class_to_color = {
     tuple(slaves): 'green',
     tuple(switches): 'yellow',
