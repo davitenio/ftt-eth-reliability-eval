@@ -144,6 +144,8 @@ for switch1, switch2 in combinations(switches, 2):
         ports.append(new_interlink_port2)
         link_to_port_edges.append((new_interlink, new_interlink_port2))
         port_to_link_edges.append((new_interlink_port2, new_interlink))
+        switch_to_port_edges.append((switch2, new_interlink_port2))
+        port_to_switch_edges.append((new_interlink_port2, switch2))
     i += interlink_redundancy
 
 G = nx.DiGraph()
