@@ -175,6 +175,19 @@ save_graph_drawing(G, 'G.png')
 ctmc = generate_ctmc(G, is_faulty, switches, slaves, num_required_slaves)
 save_ctmc_drawing(ctmc, 'ctmc.png')
 
+
+E = []
+for u, v in ctmc.edges_iter():
+    E.append(
+        (str(u.nodes()),
+         str(v.nodes()),
+         {'Label': str(ctmc[u][v]['failed_element'])}))
+
+ctmc_with_strings = nx.DiGraph()
+ctmc_with_strings.add_edges_from(E)
+
+nx.write_graphml(ctmc_with_strings, 'ctmc.graphml')
+
 print "Size of state space: {}".format(ctmc.order())
 
 for i in range(5): print
