@@ -179,9 +179,9 @@ save_ctmc_drawing(ctmc, 'ctmc.png')
 E = []
 for u, v in ctmc.edges_iter():
     E.append(
-        (str(u.nodes()),
-         str(v.nodes()),
-         {'Label': str(ctmc[u][v]['failed_element'])}))
+        (str(sorted([str(w) for w in u.nodes()])),
+         str(sorted([str(w) for w in v.nodes()])),
+         {'Label': str(sorted(ctmc[u][v]['failed_element']))}))
 
 ctmc_with_strings = nx.DiGraph()
 ctmc_with_strings.add_edges_from(E)
