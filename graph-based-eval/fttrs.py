@@ -11,16 +11,25 @@ def is_faulty(G, switches, slaves, num_necessary_slaves):
     each other in graph G for G not to be faulty.
     """
     H = nx.Graph(G)
-    num_slaves_cc = {}
-    for switch in switches:
-        num_slaves_cc[switch] = 0
-        if switch in H.nodes_iter():
-            cc = nx.node_connected_component(H, switch)
-            for vertex in cc:
-                if vertex in slaves:
-                    num_slaves_cc[switch] = num_slaves_cc[switch] + 1
-    return all([num_slaves_cc[switch] < num_necessary_slaves
-                for switch in switches])
+    num_non_faulty_cc = 0
+    for cc_vertices in nx.connected_components(H):
+        num_slaves_in_cc = len(set(cc_vertices) & set(slaves))
+        if num_slaves_in_cc < num_necessary_slaves:
+            continue
+        # Check that the slaves are not a vertex cut in the connected
+        # component.
+        H2 = nx.Graph(H)
+        H2.remove_nodes_from(slaves)
+        # We check that order > 0 because nx.is_connected() is not defined for
+        # the null graph.
+        if H2.order() > 0 and nx.is_connected(H2):
+            num_non_faulty_cc += 1
+
+    # G is faulty if it has zero non-faulty components or more than 1
+    # non-faulty component. The latter is considered a failure because we
+    # assume that if the system is split into more than one functioning
+    # subsystem, this is a failure.
+    return num_non_faulty_cc != 1
 
 
 num_slaves = 2
