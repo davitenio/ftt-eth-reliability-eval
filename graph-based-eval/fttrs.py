@@ -35,7 +35,7 @@ def is_faulty(G, switches, slaves, num_necessary_slaves):
 num_slaves = 2
 num_switches = 1
 # number of interlinks between each pair of switches
-interlink_redundancy = 2
+interlink_redundancy = 1
 num_required_slaves = 1
 
 
@@ -158,16 +158,43 @@ for switch1, switch2 in combinations(switches, 2):
     i += interlink_redundancy
 
 G = nx.DiGraph()
-G.add_edges_from(slave_to_port_edges, coverage=0)
-G.add_edges_from(port_to_slave_edges, coverage=0.5)
-G.add_edges_from(port_to_link_edges, coverage=0)
-G.add_edges_from(link_to_port_edges, coverage=0.5)
-G.add_edges_from(link_to_guardian_edges, coverage=0.5)
-G.add_edges_from(guardian_to_link_edges, coverage=0)
-G.add_edges_from(guardian_to_switch_edges, coverage=0.5)
-G.add_edges_from(switch_to_guardian_edges, coverage=0)
-G.add_edges_from(switch_to_port_edges, coverage=0)
-G.add_edges_from(port_to_switch_edges, coverage=0.5)
+G.add_edges_from(
+    slave_to_port_edges, coverage={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    port_to_slave_edges, coverage={'crash': 1, 'byzantine': 0})
+G.add_edges_from(
+    port_to_link_edges, coverage={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    link_to_port_edges, coverage={'crash': 1, 'byzantine': 0.1})
+G.add_edges_from(
+    link_to_guardian_edges, coverage={'crash': 1, 'byzantine': 0.8})
+G.add_edges_from(
+    guardian_to_link_edges, coverage={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    guardian_to_switch_edges, coverage={'crash': 1, 'byzantine': 0})
+G.add_edges_from(
+    switch_to_guardian_edges, coverage={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    switch_to_port_edges, coverage={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    port_to_switch_edges, coverage={'crash': 1, 'byzantine': 0})
+
+nx.set_node_attributes(
+    G, 'failure_rate',
+    {s: {'crash': 0.01, 'byzantine': 0.001} for s in slaves})
+nx.set_node_attributes(
+    G, 'failure_rate',
+    {p: {'crash': 0.01, 'byzantine': 0.001} for p in ports})
+nx.set_node_attributes(
+    G, 'failure_rate',
+    {l: {'crash': 0.01, 'byzantine': 0.001} for l in links})
+nx.set_node_attributes(
+    G, 'failure_rate',
+    {g: {'crash': 0.01, 'byzantine': 0.001} for g in guardians})
+nx.set_node_attributes(
+    G, 'failure_rate',
+    {b: {'crash': 0.01, 'byzantine': 0.001} for b in switches})
+
 
 class_to_color = {
     tuple(slaves): 'green',
