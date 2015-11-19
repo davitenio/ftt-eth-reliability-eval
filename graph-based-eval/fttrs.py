@@ -226,4 +226,4 @@ nx.write_graphml(ctmc_with_strings, 'ctmc.graphml')
 
 print "Size of state space: {}".format(ctmc.order())
 
-for i in range(5): print
+print
