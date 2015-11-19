@@ -76,7 +76,7 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
 
     edge_colors = []
     for u, v in graph.edges():
-        if graph.edge[u][v]['coverage'] == 0:
+        if graph.edge[u][v]['failure_mode_to_coverage'] == 0:
             edge_colors.append('red')
         else:
             edge_colors.append('blue')
@@ -108,7 +108,7 @@ def get_uncovered_neighborhood(G, v, source):
     for n in G.neighbors_iter(v):
         if n == source:
             continue
-        if G.edge[v][n]['coverage'] == 0:
+        if G.edge[v][n]['failure_mode_to_coverage'] == 0:
             uncovered_neighborhood.extend(get_uncovered_neighborhood(G, n, v))
     return uncovered_neighborhood
 

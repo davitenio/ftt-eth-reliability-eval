@@ -159,25 +159,35 @@ for switch1, switch2 in combinations(switches, 2):
 
 G = nx.DiGraph()
 G.add_edges_from(
-    slave_to_port_edges, coverage={'crash': 0, 'byzantine': 0})
+    slave_to_port_edges,
+    failure_mode_to_coverage={'crash': 0, 'byzantine': 0})
 G.add_edges_from(
-    port_to_slave_edges, coverage={'crash': 1, 'byzantine': 0})
+    port_to_slave_edges,
+    failure_mode_to_coverage={'crash': 1, 'byzantine': 0})
 G.add_edges_from(
-    port_to_link_edges, coverage={'crash': 0, 'byzantine': 0})
+    port_to_link_edges,
+    failure_mode_to_coverage={'crash': 0, 'byzantine': 0})
 G.add_edges_from(
-    link_to_port_edges, coverage={'crash': 1, 'byzantine': 0.1})
+    link_to_port_edges,
+    failure_mode_to_coverage={'crash': 1, 'byzantine': 0.1})
 G.add_edges_from(
-    link_to_guardian_edges, coverage={'crash': 1, 'byzantine': 0.8})
+    link_to_guardian_edges,
+    failure_mode_to_coverage={'crash': 1, 'byzantine': 0.8})
 G.add_edges_from(
-    guardian_to_link_edges, coverage={'crash': 0, 'byzantine': 0})
+    guardian_to_link_edges,
+    failure_mode_to_coverage={'crash': 0, 'byzantine': 0})
 G.add_edges_from(
-    guardian_to_switch_edges, coverage={'crash': 1, 'byzantine': 0})
+    guardian_to_switch_edges,
+    failure_mode_to_coverage={'crash': 1, 'byzantine': 0})
 G.add_edges_from(
-    switch_to_guardian_edges, coverage={'crash': 0, 'byzantine': 0})
+    switch_to_guardian_edges,
+    failure_mode_to_coverage={'crash': 0, 'byzantine': 0})
 G.add_edges_from(
-    switch_to_port_edges, coverage={'crash': 0, 'byzantine': 0})
+    switch_to_port_edges,
+    failure_mode_to_coverage={'crash': 0, 'byzantine': 0})
 G.add_edges_from(
-    port_to_switch_edges, coverage={'crash': 1, 'byzantine': 0})
+    port_to_switch_edges,
+    failure_mode_to_coverage={'crash': 1, 'byzantine': 0})
 
 nx.set_node_attributes(
     G, 'failure_mode_to_rate',
