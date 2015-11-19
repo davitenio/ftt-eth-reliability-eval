@@ -180,19 +180,19 @@ G.add_edges_from(
     port_to_switch_edges, coverage={'crash': 1, 'byzantine': 0})
 
 nx.set_node_attributes(
-    G, 'failure_rate',
+    G, 'failure_mode_to_rate',
     {s: {'crash': 0.01, 'byzantine': 0.001} for s in slaves})
 nx.set_node_attributes(
-    G, 'failure_rate',
+    G, 'failure_mode_to_rate',
     {p: {'crash': 0.01, 'byzantine': 0.001} for p in ports})
 nx.set_node_attributes(
-    G, 'failure_rate',
+    G, 'failure_mode_to_rate',
     {l: {'crash': 0.01, 'byzantine': 0.001} for l in links})
 nx.set_node_attributes(
-    G, 'failure_rate',
+    G, 'failure_mode_to_rate',
     {g: {'crash': 0.01, 'byzantine': 0.001} for g in guardians})
 nx.set_node_attributes(
-    G, 'failure_rate',
+    G, 'failure_mode_to_rate',
     {b: {'crash': 0.01, 'byzantine': 0.001} for b in switches})
 
 
