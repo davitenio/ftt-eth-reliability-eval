@@ -5,7 +5,7 @@ from generatectmc import save_graph_drawing, save_ctmc_drawing
 from itertools import combinations
 
 
-def is_correct(G, slaves, num_necessary_slaves):
+def is_correct(G, slaves, masters, num_necessary_slaves):
     """
     num_necessary_slaves: minimum number of slaves that must be connected to
     each other in graph G for G not to be faulty.
@@ -14,7 +14,8 @@ def is_correct(G, slaves, num_necessary_slaves):
     num_non_faulty_cc = 0
     for cc_vertices in nx.connected_components(H):
         num_slaves_in_cc = len(set(cc_vertices) & set(slaves))
-        if num_slaves_in_cc >= num_necessary_slaves:
+        num_masters_in_cc = len(set(cc_vertices) & set(masters))
+        if num_slaves_in_cc >= num_necessary_slaves and num_masters_in_cc >= 1:
             # Check that the slaves are not a vertex cut in the connected
             # component.
             H2 = nx.Graph(H)
@@ -34,8 +35,8 @@ def is_correct(G, slaves, num_necessary_slaves):
         return False
 
 
-def is_faulty(G, slaves, num_necessary_slaves):
-    return not is_correct(G, slaves, num_necessary_slaves)
+def is_faulty(G, slaves, masters, num_necessary_slaves):
+    return not is_correct(G, slaves, masters, num_necessary_slaves)
 
 
 num_slaves = 2
@@ -225,7 +226,7 @@ colorize_graph(G, class_to_color)
 print G.nodes(data=True)
 save_graph_drawing(G, 'G.png')
 
-ctmc = generate_ctmc(G, is_faulty, slaves, num_required_slaves)
+ctmc = generate_ctmc(G, is_faulty, slaves, switches, num_required_slaves)
 save_ctmc_drawing(ctmc, 'ctmc.png')
 
 
