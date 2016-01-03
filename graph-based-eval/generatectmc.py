@@ -112,7 +112,7 @@ def get_uncovered_neighborhood(G, v, source):
             uncovered_neighborhood.extend(get_uncovered_neighborhood(G, n, v))
     return uncovered_neighborhood
 
-def explore(G, F, ctmc, is_faulty, *args):
+def explore(G, F, ctmc, is_correct, *args):
     for v in G.nodes_iter():
         H = nx.DiGraph(G)
         vertices_to_delete = get_uncovered_neighborhood(G, v, None)
@@ -121,11 +121,11 @@ def explore(G, F, ctmc, is_faulty, *args):
         cc_subgraphs = nx.connected_component_subgraphs(
             nx.Graph(H), copy=False)
         for cc in list(cc_subgraphs):
-            if is_faulty(cc, *args):
+            if not is_correct(cc, *args):
                 for cc_vertex in cc.nodes_iter():
                     H.remove_node(cc_vertex)
 
-        if is_faulty(H, *args):
+        if not is_correct(H, *args):
             add_rate(ctmc, G, F, v)
             continue
 
@@ -137,17 +137,17 @@ def explore(G, F, ctmc, is_faulty, *args):
         else:
             ctmc.add_node(H)
             add_rate(ctmc, G, H, v)
-            explore(H, F, ctmc, is_faulty, *args)
+            explore(H, F, ctmc, is_correct, *args)
 
 
-def generate_ctmc(G, is_faulty, *args):
-    if is_faulty(G, *args):
+def generate_ctmc(G, is_correct, *args):
+    if not is_correct(G, *args):
         return None
     ctmc = nx.DiGraph()
     # empty graph (corresponding to the failure state)
     F = nx.Graph()
     ctmc.add_nodes_from([G, F])
-    explore(G, F, ctmc, is_faulty, *args)
+    explore(G, F, ctmc, is_correct, *args)
     return ctmc
 
 

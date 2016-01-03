@@ -35,10 +35,6 @@ def is_correct(G, slaves, masters, num_necessary_slaves):
         return False
 
 
-def is_faulty(G, slaves, masters, num_necessary_slaves):
-    return not is_correct(G, slaves, masters, num_necessary_slaves)
-
-
 num_slaves = 2
 num_switches = 1
 # number of interlinks between each pair of switches
@@ -226,7 +222,7 @@ colorize_graph(G, class_to_color)
 print G.nodes(data=True)
 save_graph_drawing(G, 'G.png')
 
-ctmc = generate_ctmc(G, is_faulty, slaves, switches, num_required_slaves)
+ctmc = generate_ctmc(G, is_correct, slaves, switches, num_required_slaves)
 save_ctmc_drawing(ctmc, 'ctmc.png')
 
 
