@@ -97,11 +97,11 @@ class Switch:
         return 'b' + str(self.index)
 
 
-slaves = [Slave() for i in range(num_slaves)]
+slaves = tuple(Slave() for i in range(num_slaves))
 ports = []
 links = []
 guardians = []
-switches = [Switch() for i in range(num_switches)]
+switches = tuple(Switch() for i in range(num_switches))
 
 slave_to_port_edges = []
 port_to_slave_edges = []
@@ -159,6 +159,10 @@ for switch1, switch2 in combinations(switches, 2):
         switch_to_port_edges.append((switch2, new_interlink_port2))
         port_to_switch_edges.append((new_interlink_port2, switch2))
     i += interlink_redundancy
+
+ports = tuple(ports)
+links = tuple(links)
+guardians = tuple(guardians)
 
 G = nx.DiGraph()
 G.add_edges_from(
