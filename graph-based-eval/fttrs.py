@@ -196,6 +196,111 @@ G.add_edges_from(
     port_to_switch_edges,
     failure_mode_to_coverage={'crash': 1, 'byzantine': 0})
 
+
+failure_mode_mutation_probs = {
+    slaves: {ports: {
+            'crash': {
+                'crash': 0.111,
+                'byzantine': 1 - 0.111
+            },
+            'byzantine': {
+                'crash': 0,
+                'byzantine': 1
+            }
+        }
+    },
+
+    ports: {slaves: {
+            'crash': {
+                'crash': 0.222,
+                'byzantine': 1 - 0.222
+            },
+            'byzantine': {
+                'crash': 0.333,
+                'byzantine': 1 - 0.333
+            }
+        }
+    },
+
+    links: {ports: {
+            'crash': {
+                'crash': 1,
+                'byzantine': 0
+            },
+            'byzantine': {
+                'crash': 0,
+                'byzantine': 1
+            }
+        }
+    },
+
+    ports: {links: {
+            'crash': {
+                'crash': 1,
+                'byzantine': 0
+            },
+            'byzantine': {
+                'crash': 0,
+                'byzantine': 1
+            }
+        }
+    },
+
+    # Guardians have crash failure semantics
+    links: {guardians: {
+            'crash': {
+                'crash': 1,
+                'byzantine': 0
+            },
+            'byzantine': {
+                'crash': 1,
+                'byzantine': 0
+            }
+        }
+    },
+
+    guardians: {links: {
+            'crash': {
+                'crash': 1,
+                'byzantine': 0
+            },
+            'byzantine': {
+                'crash': 1,
+                'byzantine': 0
+            }
+        }
+    },
+
+    # Guardians have crash failure semantics
+    switches: {guardians: {
+            'crash': {
+                'crash': 1,
+                'byzantine': 0
+            },
+            'byzantine': {
+                'crash': 1,
+                'byzantine': 0
+            }
+        }
+    },
+
+    # Switches have crash failure semantics
+    guardians: {switches: {
+            'crash': {
+                'crash': 1,
+                'byzantine': 0
+            },
+            'byzantine': {
+                'crash': 1,
+                'byzantine': 0
+            }
+        }
+    },
+
+}
+
+
+
 nx.set_node_attributes(
     G, 'failure_mode_to_rate',
     {s: {'crash': 0.01, 'byzantine': 0.001} for s in slaves})
