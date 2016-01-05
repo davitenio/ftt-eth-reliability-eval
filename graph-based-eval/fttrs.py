@@ -319,11 +319,11 @@ nx.set_node_attributes(
 
 
 class_to_color = {
-    tuple(slaves): 'green',
-    tuple(switches): 'yellow',
-    tuple(links): 'blue',
-    tuple(ports): 'red',
-    tuple(guardians): 'cyan',
+    slaves: 'green',
+    switches: 'yellow',
+    links: 'blue',
+    ports: 'red',
+    guardians: 'cyan',
 }
 
 colorize_graph(G, class_to_color)
