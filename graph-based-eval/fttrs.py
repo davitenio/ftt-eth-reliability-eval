@@ -302,20 +302,21 @@ failure_mode_mutation_probs = {
 
 
 nx.set_node_attributes(
-    G, 'failure_mode_to_rate',
+    G, 'failure_rate_vector',
     {s: {'crash': 0.01, 'byzantine': 0.001} for s in slaves})
 nx.set_node_attributes(
-    G, 'failure_mode_to_rate',
+    G, 'failure_rate_vector',
     {p: {'crash': 0.01, 'byzantine': 0.001} for p in ports})
 nx.set_node_attributes(
-    G, 'failure_mode_to_rate',
+    G, 'failure_rate_vector',
     {l: {'crash': 0.01, 'byzantine': 0.001} for l in links})
 nx.set_node_attributes(
-    G, 'failure_mode_to_rate',
+    G, 'failure_rate_vector',
     {g: {'crash': 0.01, 'byzantine': 0.001} for g in guardians})
 nx.set_node_attributes(
-    G, 'failure_mode_to_rate',
+    G, 'failure_rate_vector',
     {b: {'crash': 0.01, 'byzantine': 0.001} for b in switches})
+
 
 
 class_to_color = {
