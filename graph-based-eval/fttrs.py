@@ -165,37 +165,6 @@ links = tuple(links)
 guardians = tuple(guardians)
 
 G = nx.DiGraph()
-G.add_edges_from(
-    slave_to_port_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
-G.add_edges_from(
-    port_to_slave_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0})
-G.add_edges_from(
-    port_to_link_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
-G.add_edges_from(
-    link_to_port_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0.1})
-G.add_edges_from(
-    link_to_guardian_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0.8})
-G.add_edges_from(
-    guardian_to_link_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
-G.add_edges_from(
-    guardian_to_switch_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0})
-G.add_edges_from(
-    switch_to_guardian_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
-G.add_edges_from(
-    switch_to_port_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
-G.add_edges_from(
-    port_to_switch_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0})
-
 
 failure_mode_mutation_probabilities = {
     slaves: {
@@ -395,6 +364,37 @@ failure_mode_mutation_probabilities = {
     },
 }
 
+
+G.add_edges_from(
+    slave_to_port_edges,
+    coverage_vector={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    port_to_slave_edges,
+    coverage_vector={'crash': 1, 'byzantine': 0})
+G.add_edges_from(
+    port_to_link_edges,
+    coverage_vector={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    link_to_port_edges,
+    coverage_vector={'crash': 1, 'byzantine': 0.1})
+G.add_edges_from(
+    link_to_guardian_edges,
+    coverage_vector={'crash': 1, 'byzantine': 0.8})
+G.add_edges_from(
+    guardian_to_link_edges,
+    coverage_vector={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    guardian_to_switch_edges,
+    coverage_vector={'crash': 1, 'byzantine': 0})
+G.add_edges_from(
+    switch_to_guardian_edges,
+    coverage_vector={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    switch_to_port_edges,
+    coverage_vector={'crash': 0, 'byzantine': 0})
+G.add_edges_from(
+    port_to_switch_edges,
+    coverage_vector={'crash': 1, 'byzantine': 0})
 
 
 nx.set_node_attributes(
