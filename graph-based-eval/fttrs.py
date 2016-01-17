@@ -367,34 +367,44 @@ failure_mode_mutation_probabilities = {
 
 G.add_edges_from(
     slave_to_port_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
+    coverage_vector={'crash': 0, 'byzantine': 0},
+    matrix=failure_mode_mutation_probabilities[slaves][ports])
 G.add_edges_from(
     port_to_slave_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0})
+    coverage_vector={'crash': 1, 'byzantine': 0},
+    matrix=failure_mode_mutation_probabilities[ports][slaves])
 G.add_edges_from(
     port_to_link_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
+    coverage_vector={'crash': 0, 'byzantine': 0},
+    matrix=failure_mode_mutation_probabilities[ports][links])
 G.add_edges_from(
     link_to_port_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0.1})
+    coverage_vector={'crash': 1, 'byzantine': 0.1},
+    matrix=failure_mode_mutation_probabilities[links][ports])
 G.add_edges_from(
     link_to_guardian_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0.8})
+    coverage_vector={'crash': 1, 'byzantine': 0.8},
+    matrix=failure_mode_mutation_probabilities[links][guardians])
 G.add_edges_from(
     guardian_to_link_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
+    coverage_vector={'crash': 0, 'byzantine': 0},
+    matrix=failure_mode_mutation_probabilities[guardians][links])
 G.add_edges_from(
     guardian_to_switch_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0})
+    coverage_vector={'crash': 1, 'byzantine': 0},
+    matrix=failure_mode_mutation_probabilities[guardians][switches])
 G.add_edges_from(
     switch_to_guardian_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
+    coverage_vector={'crash': 0, 'byzantine': 0},
+    matrix=failure_mode_mutation_probabilities[switches][guardians])
 G.add_edges_from(
     switch_to_port_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0})
+    coverage_vector={'crash': 0, 'byzantine': 0},
+    matrix=failure_mode_mutation_probabilities[switches][ports])
 G.add_edges_from(
     port_to_switch_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0})
+    coverage_vector={'crash': 1, 'byzantine': 0},
+    matrix=failure_mode_mutation_probabilities[ports][switches])
 
 
 nx.set_node_attributes(
