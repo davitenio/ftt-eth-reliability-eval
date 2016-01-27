@@ -74,15 +74,8 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     nx.draw_networkx_nodes(graph, graph_pos, node_size=node_size,
                            alpha=node_alpha, node_color=colors, ax=axis)
 
-    edge_colors = []
-    for u, v in graph.edges():
-        if graph.edge[u][v]['coverage_vector'] == 0:
-            edge_colors.append('red')
-        else:
-            edge_colors.append('blue')
-
     nx.draw_networkx_edges(graph, graph_pos, width=edge_tickness,
-                           alpha=edge_alpha, edge_color=edge_colors,
+                           alpha=edge_alpha, edge_color=['blue'],
                            arrows=True, ax=axis)
     nx.draw_networkx_labels(graph, graph_pos, font_size=node_text_size,
                             font_family=text_font, ax=axis)
