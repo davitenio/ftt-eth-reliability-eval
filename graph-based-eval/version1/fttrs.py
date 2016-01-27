@@ -166,262 +166,38 @@ guardians = tuple(guardians)
 
 G = nx.DiGraph()
 
-failure_mode_mutation_probabilities = {
-    slaves: {
-        ports: {
-            'crash': {
-                # Probability of a port crashing when it cannot contain a
-                # crash from an adjacent slave.
-                'crash': 0.111,
-                # Probability of a port becoming byzantine when it cannot
-                # contain a crash from an adjacent slave.
-                'byzantine': 1 - 0.111
-            },
-            'byzantine': {
-                # Probability of a port crashing when it cannot contain a
-                # byzantine from an adjacent slave.
-                'crash': 0,
-                # Probability of a port becoming byzantine when it cannot
-                # contain a byzantine from an adjacent slave.
-                'byzantine': 1
-            }
-        }
-    },
+G.add_edges_from(slave_to_port_edges)
+G.add_edges_from(port_to_slave_edges)
+G.add_edges_from(port_to_link_edges)
+G.add_edges_from(link_to_port_edges)
+G.add_edges_from(link_to_guardian_edges)
+G.add_edges_from(guardian_to_link_edges)
+G.add_edges_from(guardian_to_switch_edges)
+G.add_edges_from(switch_to_guardian_edges)
+G.add_edges_from(switch_to_port_edges)
+G.add_edges_from(port_to_switch_edges)
 
-    ports: {
-        slaves: {
-            'crash': {
-                # Probability of a slave crashing when it cannot contain a
-                # crash from an adjacent port.
-                'crash': 0.222,
-                # Probability of a slave becoming byzantine when it cannot
-                # contain a crash from an adjacent port.
-                'byzantine': 1 - 0.222
-            },
-            'byzantine': {
-                # Probability of a slave crashing when it cannot contain a
-                # byzantine from an adjacent port.
-                'crash': 0.333,
-                # Probability of a slave becoming byzantine when it cannot
-                # contain a byzantine from an adjacent port.
-                'byzantine': 1 - 0.333
-            }
-        },
-        switches: {
-            'crash': {
-                # Probability of a switch crashing when it cannot contain a
-                # crash from an adjacent port.
-                'crash': 1,
-                # Probability of a switch becoming byzantine when it cannot
-                # contain a crash from an adjacent port.
-                'byzantine': 0
-            },
-            'byzantine': {
-                # Probability of a switch crashing when it cannot contain a
-                # byzantine from an adjacent port.
-                'crash': 1,
-                # Probability of a switch becoming byzantine when it cannot
-                # contain a byzantine from an adjacent port.
-                'byzantine': 0
-            }
-        },
-        links: {
-            'crash': {
-                # Probability of a link crashing when it cannot contain a
-                # crash from an adjacent port.
-                'crash': 1,
-                # Probability of a link becoming byzantine when it cannot
-                # contain a crash from an adjacent port.
-                'byzantine': 0
-            },
-            'byzantine': {
-                # Probability of a link crashing when it cannot contain a
-                # byzantine from an adjacent port.
-                'crash': 0,
-                # Probability of a link becoming byzantine when it cannot
-                # contain a byzantine from an adjacent port.
-                'byzantine': 1
-            }
-        }
-    },
-
-    links: {
-        ports: {
-            'crash': {
-                # Probability of a port crashing when it cannot contain a
-                # crash from an adjacent link.
-                'crash': 1,
-                # Probability of a port becoming byzantine when it cannot
-                # contain a crash from an adjacent link.
-                'byzantine': 0
-            },
-            'byzantine': {
-                # Probability of a port crashing when it cannot contain a
-                # byzantine from an adjacent link.
-                'crash': 0,
-                # Probability of a port becoming byzantine when it cannot
-                # contain a byzantine from an adjacent link.
-                'byzantine': 1
-            }
-        },
-        guardians: {
-            'crash': {
-                # Probability of a guardian crashing when it cannot contain a
-                # crash from an adjacent link.
-                'crash': 1,
-                # Probability of a guardian becoming byzantine when it cannot
-                # contain a crash from an adjacent link.
-                'byzantine': 0
-            },
-            'byzantine': {
-                # Probability of a guardian crashing when it cannot contain a
-                # byzantine from an adjacent link.
-                'crash': 1,
-                # Probability of a guardian becoming byzantine when it cannot
-                # contain a byzantine from an adjacent link.
-                'byzantine': 0
-            }
-        }
-    },
-
-    guardians: {
-        links: {
-            'crash': {
-                # Probability of a link crashing when it cannot contain a
-                # crash from an adjacent guardian.
-                'crash': 1,
-                # Probability of a link becoming byzantine when it cannot
-                # contain a crash from an adjacent guardian.
-                'byzantine': 0
-            },
-            'byzantine': {
-                # Probability of a link crashing when it cannot contain a
-                # byzantine from an adjacent guardian.
-                'crash': 1,
-                # Probability of a link becoming byzantine when it cannot
-                # contain a byzantine from an adjacent guardian.
-                'byzantine': 0
-            }
-        },
-        switches: {
-            'crash': {
-                # Probability of a switch crashing when it cannot contain a
-                # crash from an adjacent guardian.
-                'crash': 1,
-                # Probability of a switch becoming byzantine when it cannot
-                # contain a crash from an adjacent guardian.
-                'byzantine': 0
-            },
-            'byzantine': {
-                # Probability of a switch crashing when it cannot contain a
-                # byzantine from an adjacent guardian.
-                'crash': 1,
-                # Probability of a switch becoming byzantine when it cannot
-                # contain a byzantine from an adjacent guardian.
-                'byzantine': 0
-            }
-        }
-    },
-
-    # Guardians have crash failure semantics
-    switches: {
-        ports: {
-            'crash': {
-                # Probability of a port crashing when it cannot contain a
-                # crash from an adjacent switch.
-                'crash': 0.111,
-                # Probability of a port becoming byzantine when it cannot
-                # contain a crash from an adjacent switch.
-                'byzantine': 1 - 0.111
-            },
-            'byzantine': {
-                # Probability of a port crashing when it cannot contain a
-                # byzantine from an adjacent switch.
-                'crash': 0,
-                # Probability of a port becoming byzantine when it cannot
-                # contain a byzantine from an adjacent switch.
-                'byzantine': 1
-            }
-        },
-        guardians: {
-            'crash': {
-                # Probability of a guardian crashing when it cannot contain a
-                # crash from an adjacent switch.
-                'crash': 1,
-                # Probability of a guardian becoming byzantine when it cannot
-                # contain a crash from an adjacent switch.
-                'byzantine': 0
-            },
-            'byzantine': {
-                # Probability of a guardian crashing when it cannot contain a
-                # byzantine from an adjacent switch.
-                'crash': 1,
-                # Probability of a guardian becoming byzantine when it cannot
-                # contain a byzantine from an adjacent switch.
-                'byzantine': 0
-            }
-        }
-    },
-}
-
-
-G.add_edges_from(
-    slave_to_port_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0},
-    matrix=failure_mode_mutation_probabilities[slaves][ports])
-G.add_edges_from(
-    port_to_slave_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0},
-    matrix=failure_mode_mutation_probabilities[ports][slaves])
-G.add_edges_from(
-    port_to_link_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0},
-    matrix=failure_mode_mutation_probabilities[ports][links])
-G.add_edges_from(
-    link_to_port_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0.1},
-    matrix=failure_mode_mutation_probabilities[links][ports])
-G.add_edges_from(
-    link_to_guardian_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0.8},
-    matrix=failure_mode_mutation_probabilities[links][guardians])
-G.add_edges_from(
-    guardian_to_link_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0},
-    matrix=failure_mode_mutation_probabilities[guardians][links])
-G.add_edges_from(
-    guardian_to_switch_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0},
-    matrix=failure_mode_mutation_probabilities[guardians][switches])
-G.add_edges_from(
-    switch_to_guardian_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0},
-    matrix=failure_mode_mutation_probabilities[switches][guardians])
-G.add_edges_from(
-    switch_to_port_edges,
-    coverage_vector={'crash': 0, 'byzantine': 0},
-    matrix=failure_mode_mutation_probabilities[switches][ports])
-G.add_edges_from(
-    port_to_switch_edges,
-    coverage_vector={'crash': 1, 'byzantine': 0},
-    matrix=failure_mode_mutation_probabilities[ports][switches])
-
+slave_failure_rate = 0.01
+port_failure_rate = 0.01
+link_failure_rate = 0.01
+guardian_failure_rate = 0.01
+switch_failure_rate = 0.01
 
 nx.set_node_attributes(
-    G, 'failure_rate_vector',
-    {s: {'crash': 0.01, 'byzantine': 0.001} for s in slaves})
+    G, 'failure_rate',
+    {s: slave_failure_rate for s in slaves})
 nx.set_node_attributes(
-    G, 'failure_rate_vector',
-    {p: {'crash': 0.01, 'byzantine': 0.001} for p in ports})
+    G, 'failure_rate',
+    {p: port_failure_rate for p in ports})
 nx.set_node_attributes(
-    G, 'failure_rate_vector',
-    {l: {'crash': 0.01, 'byzantine': 0.001} for l in links})
+    G, 'failure_rate',
+    {l: link_failure_rate for l in links})
 nx.set_node_attributes(
-    G, 'failure_rate_vector',
-    {g: {'crash': 0.01, 'byzantine': 0.001} for g in guardians})
+    G, 'failure_rate',
+    {g: guardian_failure_rate for g in guardians})
 nx.set_node_attributes(
-    G, 'failure_rate_vector',
-    {b: {'crash': 0.01, 'byzantine': 0.001} for b in switches})
+    G, 'failure_rate',
+    {b: switch_failure_rate for b in switches})
 
 
 
