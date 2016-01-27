@@ -98,7 +98,8 @@ def colors_match(n1_attrib, n2_attrib):
 
 def explore(G, F, ctmc, is_correct, *args):
     for v in G.nodes_iter():
-        H = nx.DiGraph(G)
+        # Use nx.Graph(G) to do a shallow copy. G.copy() would do a deep copy.
+        H = nx.Graph(G)
         H.remove_node(v)
 
         cc_subgraphs = nx.connected_component_subgraphs(
