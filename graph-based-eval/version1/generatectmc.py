@@ -96,20 +96,10 @@ def colors_match(n1_attrib, n2_attrib):
     return n1_attrib['color']==n2_attrib['color']
 
 
-def get_uncovered_neighborhood(G, v, source):
-    uncovered_neighborhood = [v]
-    for n in G.neighbors_iter(v):
-        if n == source:
-            continue
-        if G.edge[v][n]['coverage_vector'] == 0:
-            uncovered_neighborhood.extend(get_uncovered_neighborhood(G, n, v))
-    return uncovered_neighborhood
-
 def explore(G, F, ctmc, is_correct, *args):
     for v in G.nodes_iter():
         H = nx.DiGraph(G)
-        vertices_to_delete = get_uncovered_neighborhood(G, v, None)
-        H.remove_nodes_from(vertices_to_delete)
+        H.remove_node(v)
 
         cc_subgraphs = nx.connected_component_subgraphs(
             nx.Graph(H), copy=False)
