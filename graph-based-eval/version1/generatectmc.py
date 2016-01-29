@@ -96,7 +96,7 @@ def colors_match(n1_attrib, n2_attrib):
     return n1_attrib['color']==n2_attrib['color']
 
 
-def get_isomorphic_state(ctmc, H):
+def get_color_isomorphic_state(ctmc, H):
     """
         Return a state of the continuous-time Markov chain ctmc that is a graph
         which is isomorphic to the graph H.
@@ -125,16 +125,16 @@ def explore(ctmc, G, failure_state, is_correct, *args):
             add_rate(ctmc, G, failure_state, vertex)
             continue
 
-        isomorphic_state = get_isomorphic_state(ctmc, H)
+        color_isomorphic_state = get_color_isomorphic_state(ctmc, H)
 
         current_state = G
-        if isomorphic_state == None:
+        if color_isomorphic_state == None:
             new_state = H
             ctmc.add_node(new_state)
             add_rate(ctmc, current_state, new_state, vertex)
             explore(ctmc, new_state, failure_state, is_correct, *args)
         else:
-            add_rate(ctmc, current_state, isomorphic_state, vertex)
+            add_rate(ctmc, current_state, color_isomorphic_state, vertex)
 
 
 def generate_ctmc(G, is_correct, *args):
