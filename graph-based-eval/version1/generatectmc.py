@@ -92,8 +92,8 @@ def add_rate(ctmc, src_state, dst_state, failed_element):
         ctmc.add_edge(src_state, dst_state, failed_element=[failed_element])
 
 
-def colors_match(n1_attrib, n2_attrib):
-    return n1_attrib['color']==n2_attrib['color']
+def colors_match(n1_attribute, n2_attribute):
+    return n1_attribute['color'] == n2_attribute['color']
 
 
 def get_color_isomorphic_state(ctmc, H):
