@@ -150,11 +150,13 @@ def explore(ctmc, G, failure_state, is_correct, *args):
 
         current_state = G
         if color_isomorphic_state == None:
+            # Create new state in ctmc and add a transition to it
             new_state = H
             ctmc.add_node(new_state)
             add_rate(ctmc, current_state, new_state, vertex)
             explore(ctmc, new_state, failure_state, is_correct, *args)
         else:
+            # Update existing transition in ctmc
             add_rate(ctmc, current_state, color_isomorphic_state, vertex)
 
 
