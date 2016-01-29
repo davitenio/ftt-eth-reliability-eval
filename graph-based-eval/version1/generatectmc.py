@@ -107,6 +107,25 @@ def get_color_isomorphic_state(ctmc, H):
     return None
 
 
+def delete_vertex_set(G, vertex_set):
+    """
+        Delete the vertices in vertex_set from G.
+    """
+    for vertex in vertex_set:
+        G.remove_node(vertex)
+
+
+def strip_faulty_components(G, is_correct, *args):
+    """
+        Delete all connected components of G that are faulty according to the
+        function is_correct when called with args.
+    """
+    cc_subgraphs = nx.connected_component_subgraphs(G, copy=False)
+    for cc in list(cc_subgraphs):
+        if not is_correct(cc, *args):
+            delete_vertex_set(G, cc.nodes_iter())
+
+
 def explore(ctmc, G, failure_state, is_correct, *args):
     """
         ctmc: continuous-time Markov Chain that is being built.
@@ -121,7 +140,9 @@ def explore(ctmc, G, failure_state, is_correct, *args):
         H = nx.Graph(G)
         H.remove_node(vertex)
 
-        if not is_correct(H, *args):
+        strip_faulty_components(H, is_correct, *args)
+
+        if nx.number_connected_components(H) != 1:
             add_rate(ctmc, G, failure_state, vertex)
             continue
 
