@@ -164,7 +164,7 @@ ports = tuple(ports)
 links = tuple(links)
 guardians = tuple(guardians)
 
-G = nx.DiGraph()
+G = nx.Graph()
 
 G.add_edges_from(slave_to_port_edges)
 G.add_edges_from(port_to_slave_edges)

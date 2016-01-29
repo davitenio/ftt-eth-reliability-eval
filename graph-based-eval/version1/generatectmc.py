@@ -75,7 +75,7 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
                            alpha=node_alpha, node_color=colors, ax=axis)
 
     nx.draw_networkx_edges(graph, graph_pos, width=edge_tickness,
-                           alpha=edge_alpha, edge_color=['blue'],
+                           alpha=edge_alpha, edge_color='blue',
                            arrows=True, ax=axis)
     nx.draw_networkx_labels(graph, graph_pos, font_size=node_text_size,
                             font_family=text_font, ax=axis)
@@ -96,32 +96,45 @@ def colors_match(n1_attrib, n2_attrib):
     return n1_attrib['color']==n2_attrib['color']
 
 
-def explore(G, F, ctmc, is_correct, *args):
-    for v in G.nodes_iter():
+def get_isomorphic_state(ctmc, H):
+    """
+        Return a state of the continuous-time Markov chain ctmc that is a graph
+        which is isomorphic to the graph H.
+    """
+    for state in ctmc.nodes_iter():
+        if nx.is_isomorphic(H, state, node_match=colors_match):
+            return state
+    return None
+
+
+def explore(ctmc, G, failure_state, is_correct, *args):
+    """
+        ctmc: continuous-time Markov Chain that is being built.
+        G:
+        failure_state: empty graph corresponding to an absorbing failure state.
+        is_correct: callback function that distinguishes faulty from non-faulty
+            graphs.
+        *args: arguments for the callback function is_correct.
+    """
+    for vertex in G.nodes_iter():
         # Use nx.Graph(G) to do a shallow copy. G.copy() would do a deep copy.
         H = nx.Graph(G)
-        H.remove_node(v)
-
-        cc_subgraphs = nx.connected_component_subgraphs(
-            nx.Graph(H), copy=False)
-        for cc in list(cc_subgraphs):
-            if not is_correct(cc, *args):
-                for cc_vertex in cc.nodes_iter():
-                    H.remove_node(cc_vertex)
+        H.remove_node(vertex)
 
         if not is_correct(H, *args):
-            add_rate(ctmc, G, F, v)
+            add_rate(ctmc, G, failure_state, vertex)
             continue
 
-        for state in ctmc.nodes_iter():
-            if nx.is_isomorphic(
-                    nx.Graph(state), nx.Graph(H), node_match=colors_match):
-                add_rate(ctmc, G, state, v)
-                break
+        isomorphic_state = get_isomorphic_state(ctmc, H)
+
+        current_state = G
+        if isomorphic_state == None:
+            new_state = H
+            ctmc.add_node(new_state)
+            add_rate(ctmc, current_state, new_state, vertex)
+            explore(ctmc, new_state, failure_state, is_correct, *args)
         else:
-            ctmc.add_node(H)
-            add_rate(ctmc, G, H, v)
-            explore(H, F, ctmc, is_correct, *args)
+            add_rate(ctmc, current_state, isomorphic_state, vertex)
 
 
 def generate_ctmc(G, is_correct, *args):
@@ -131,7 +144,7 @@ def generate_ctmc(G, is_correct, *args):
     # empty graph (corresponding to the failure state)
     F = nx.Graph()
     ctmc.add_nodes_from([G, F])
-    explore(G, F, ctmc, is_correct, *args)
+    explore(ctmc, G, F, is_correct, *args)
     return ctmc
 
 
