@@ -5,7 +5,7 @@ from generatectmc import save_graph_drawing, save_ctmc_drawing
 from itertools import combinations
 
 
-def is_correct(G, slaves, masters, num_necessary_slaves):
+def indicator(G, slaves, masters, num_necessary_slaves):
     """
     num_necessary_slaves: minimum number of slaves that must be connected to
     each other in graph G for G not to be faulty.
@@ -214,7 +214,7 @@ colorize_graph(G, class_to_color)
 print G.nodes(data=True)
 save_graph_drawing(G, 'G.png')
 
-ctmc = generate_ctmc(G, is_correct, slaves, switches, num_required_slaves)
+ctmc = generate_ctmc(G, indicator, slaves, switches, num_required_slaves)
 save_ctmc_drawing(ctmc, 'ctmc.png')
 
 

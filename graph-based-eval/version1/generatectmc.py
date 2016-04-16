@@ -115,32 +115,32 @@ def delete_vertex_set(G, vertex_set):
         G.remove_node(vertex)
 
 
-def strip_faulty_components(G, is_correct, *args):
+def strip_faulty_components(G, indicator, *args):
     """
         Delete all connected components of G that are faulty according to the
-        function is_correct when called with args.
+        function indicator when called with args.
     """
     cc_subgraphs = nx.connected_component_subgraphs(G, copy=False)
     for cc in list(cc_subgraphs):
-        if not is_correct(cc, *args):
+        if not indicator(cc, *args):
             delete_vertex_set(G, cc.nodes_iter())
 
 
-def explore(ctmc, G, failure_state, is_correct, *args):
+def explore(ctmc, G, failure_state, indicator, *args):
     """
         ctmc: continuous-time Markov Chain that is being built.
         G:
         failure_state: empty graph corresponding to an absorbing failure state.
-        is_correct: callback function that distinguishes faulty from non-faulty
+        indicator: callback function that distinguishes faulty from non-faulty
             graphs.
-        *args: arguments for the callback function is_correct.
+        *args: arguments for the callback function indicator.
     """
     for vertex in G.nodes_iter():
         # Use nx.Graph(G) to do a shallow copy. G.copy() would do a deep copy.
         H = nx.Graph(G)
         H.remove_node(vertex)
 
-        strip_faulty_components(H, is_correct, *args)
+        strip_faulty_components(H, indicator, *args)
 
         if nx.number_connected_components(H) != 1:
             add_rate(ctmc, G, failure_state, vertex)
@@ -154,20 +154,20 @@ def explore(ctmc, G, failure_state, is_correct, *args):
             new_state = H
             ctmc.add_node(new_state)
             add_rate(ctmc, current_state, new_state, vertex)
-            explore(ctmc, new_state, failure_state, is_correct, *args)
+            explore(ctmc, new_state, failure_state, indicator, *args)
         else:
             # Update existing transition in ctmc
             add_rate(ctmc, current_state, color_isomorphic_state, vertex)
 
 
-def generate_ctmc(G, is_correct, *args):
-    if not is_correct(G, *args):
+def generate_ctmc(G, indicator, *args):
+    if not indicator(G, *args):
         return None
     ctmc = nx.DiGraph()
     # empty graph (corresponding to the failure state)
     F = nx.Graph()
     ctmc.add_nodes_from([G, F])
-    explore(ctmc, G, F, is_correct, *args)
+    explore(ctmc, G, F, indicator, *args)
     return ctmc
 
 
