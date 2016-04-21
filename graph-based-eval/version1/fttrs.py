@@ -5,34 +5,34 @@ from generatectmc import save_graph_drawing, save_ctmc_drawing
 from itertools import combinations
 
 
-def indicator(G, slaves, masters, num_necessary_slaves):
+def is_vertex_cut(G, vertices):
     """
-    num_necessary_slaves: minimum number of slaves that must be connected to
-    each other in graph G for G not to be faulty.
+    Check that 'vertices' are not a vertex cut in G.
     """
     H = nx.Graph(G)
-    num_non_faulty_cc = 0
-    for cc_vertices in nx.connected_components(H):
-        num_slaves_in_cc = len(set(cc_vertices) & set(slaves))
-        num_masters_in_cc = len(set(cc_vertices) & set(masters))
-        if num_slaves_in_cc >= num_necessary_slaves and num_masters_in_cc >= 1:
-            # Check that the slaves are not a vertex cut in the connected
-            # component.
-            H2 = nx.Graph(H)
-            H2.remove_nodes_from(slaves)
-            # We check that order > 0 because nx.is_connected() is not defined
-            # for the null graph.
-            if H2.order() > 0 and nx.is_connected(H2):
-                num_non_faulty_cc += 1
-
-    # G is correct (non-faulty) if it has exactly 1 non-faulty connected
-    # component. Having more than 1 correct component is considered a failure
-    # because we assume that if the system is split into more than one
-    # functioning subsystem, this is a failure.
-    if num_non_faulty_cc == 1:
-        return True
-    else:
+    H.remove_nodes_from(vertices)
+    # We check that order > 0 because nx.is_connected() is not defined
+    # for the null graph.
+    if H.order() > 0 and nx.is_connected(H):
         return False
+    return True
+
+
+def indicator(G, slaves, masters, min_slave_redundancy_level):
+    """
+    min_slave_redundancy_level: minimum number of slaves that must be correctly
+    connected to each other and masters for the network modeled by G not to be
+    faulty.
+    """
+    if G.order() == 0:
+        return False
+    num_slaves_in_G = len(set(G.nodes()) & set(slaves))
+    num_masters_in_G = len(set(G.nodes()) & set(masters))
+    if (num_slaves_in_G >= min_slave_redundancy_level and
+        num_masters_in_G >= 1 and nx.is_connected(G) and
+        not is_vertex_cut(G, slaves)):
+        return True
+    return False
 
 
 num_slaves = 2
