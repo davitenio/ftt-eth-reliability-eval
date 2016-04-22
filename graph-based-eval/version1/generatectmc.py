@@ -85,6 +85,23 @@ def save_graph_drawing(graph, filename, labels=None, graph_layout='spring',
     plt.savefig(filename)
 
 
+def is_faulty(G, indicator, indicator_args):
+    """
+    G is correct (non-faulty) if it has exactly 1 non-faulty connected
+    component. Having more than 1 correct component is considered a failure
+    because we assume that if the system is split into more than one
+    functioning subsystem, this is a failure.
+    """
+    num_non_faulty_cc = 0
+    for component in nx.connected_component_subgraphs(G, copy=False):
+        if indicator(component, *indicator_args):
+            num_non_faulty_cc += 1
+    if num_non_faulty_cc == 1:
+        return False
+    else:
+        return True
+
+
 def add_rate(ctmc, src_state, dst_state, failed_element):
     if ctmc.has_edge(src_state, dst_state):
         ctmc.edge[src_state][dst_state]['failed_element'].append(failed_element)
@@ -115,32 +132,32 @@ def delete_vertex_set(G, vertex_set):
         G.remove_node(vertex)
 
 
-def strip_faulty_components(G, indicator, *args):
+def strip_faulty_components(G, indicator, indicator_args):
     """
     Delete all connected components of G that are faulty according to the
     function indicator when called with indicator_args.
     """
     cc_subgraphs = nx.connected_component_subgraphs(G, copy=False)
     for cc in list(cc_subgraphs):
-        if not indicator(cc, *args):
+        if not indicator(cc, *indicator_args):
             delete_vertex_set(G, cc.nodes_iter())
 
 
-def explore(ctmc, G, failure_state, indicator, *args):
+def explore(ctmc, G, failure_state, indicator, indicator_args):
     """
     ctmc: continuous-time Markov Chain that is being built.
     G:
     failure_state: empty graph corresponding to an absorbing failure state.
     indicator: callback function that distinguishes faulty from non-faulty
         graphs.
-    *indicator_args: arguments for the callback function indicator.
+    indicator_args: arguments for the callback function indicator.
     """
     for vertex in G.nodes_iter():
         # Use nx.Graph(G) to do a shallow copy. G.copy() would do a deep copy.
         H = nx.Graph(G)
         H.remove_node(vertex)
 
-        strip_faulty_components(H, indicator, *args)
+        strip_faulty_components(H, indicator, indicator_args)
 
         if nx.number_connected_components(H) != 1:
             add_rate(ctmc, G, failure_state, vertex)
@@ -154,20 +171,20 @@ def explore(ctmc, G, failure_state, indicator, *args):
             new_state = H
             ctmc.add_node(new_state)
             add_rate(ctmc, current_state, new_state, vertex)
-            explore(ctmc, new_state, failure_state, indicator, *args)
+            explore(ctmc, new_state, failure_state, indicator, indicator_args)
         else:
             # Update existing transition in ctmc
             add_rate(ctmc, current_state, color_isomorphic_state, vertex)
 
 
-def generate_ctmc(G, indicator, *args):
-    if not indicator(G, *args):
+def generate_ctmc(G, indicator, indicator_args):
+    if is_faulty(G, indicator, indicator_args):
         return None
     ctmc = nx.DiGraph()
     # empty graph (corresponding to the failure state)
     F = nx.Graph()
     ctmc.add_nodes_from([G, F])
-    explore(ctmc, G, F, indicator, *args)
+    explore(ctmc, G, F, indicator, indicator_args)
     return ctmc
 
 
