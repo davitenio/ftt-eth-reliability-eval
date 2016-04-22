@@ -98,8 +98,8 @@ def colors_match(n1_attribute, n2_attribute):
 
 def get_color_isomorphic_state(ctmc, H):
     """
-        Return a state of the continuous-time Markov chain ctmc that is a graph
-        which is isomorphic to the graph H.
+    Return a state of the continuous-time Markov chain ctmc that is a graph
+    which is isomorphic to the graph H.
     """
     for state in ctmc.nodes_iter():
         if nx.is_isomorphic(H, state, node_match=colors_match):
@@ -109,7 +109,7 @@ def get_color_isomorphic_state(ctmc, H):
 
 def delete_vertex_set(G, vertex_set):
     """
-        Delete the vertices in vertex_set from G.
+    Delete the vertices in vertex_set from G.
     """
     for vertex in vertex_set:
         G.remove_node(vertex)
@@ -117,8 +117,8 @@ def delete_vertex_set(G, vertex_set):
 
 def strip_faulty_components(G, indicator, *args):
     """
-        Delete all connected components of G that are faulty according to the
-        function indicator when called with args.
+    Delete all connected components of G that are faulty according to the
+    function indicator when called with indicator_args.
     """
     cc_subgraphs = nx.connected_component_subgraphs(G, copy=False)
     for cc in list(cc_subgraphs):
@@ -128,12 +128,12 @@ def strip_faulty_components(G, indicator, *args):
 
 def explore(ctmc, G, failure_state, indicator, *args):
     """
-        ctmc: continuous-time Markov Chain that is being built.
-        G:
-        failure_state: empty graph corresponding to an absorbing failure state.
-        indicator: callback function that distinguishes faulty from non-faulty
-            graphs.
-        *args: arguments for the callback function indicator.
+    ctmc: continuous-time Markov Chain that is being built.
+    G:
+    failure_state: empty graph corresponding to an absorbing failure state.
+    indicator: callback function that distinguishes faulty from non-faulty
+        graphs.
+    *indicator_args: arguments for the callback function indicator.
     """
     for vertex in G.nodes_iter():
         # Use nx.Graph(G) to do a shallow copy. G.copy() would do a deep copy.
